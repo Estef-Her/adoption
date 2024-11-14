@@ -1,0 +1,400 @@
+:root{
+  --secundary-color:#d1956a;
+  --principal-color:#f2e8e1;
+  --secundary-color-rgba: 209, 149, 106, 0.69; 
+}
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+img {
+  display: block;
+  margin-top: 20px;
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+#label-container {
+  margin-top: 20px;
+  font-size: 18px;
+}
+.custom-navbar {
+  background-color: var(--principal-color); /* Color de fondo deseado */
+  color: #333; /* Color de texto */
+}
+
+.custom-navbar .navbar-nav .nav-link {
+  font-weight:normal;
+  color: #000000; /* Color de los enlaces */
+}
+
+.custom-navbar .navbar-nav .nav-link:hover {
+  color: var(--secundary-color); /* Color de los enlaces al pasar el ratón */
+}
+
+.custom-navbar .form-control {
+  margin-right: 10px; /* Espaciado entre el campo de búsqueda y el botón */
+}
+.custom-navbar button {
+  background-color: var(--secundary-color); /* Espaciado entre el campo de búsqueda y el botón */
+}
+.custom-navbar .btn-danger {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.custom-navbar .btn-danger:hover {
+  color: #fff;
+  background-color: #bb2d3b;
+  border-color: #b02a37;
+}
+
+.custom-navbar .btn-danger:focus {
+  box-shadow: 0 0 0 0.25rem rgba(225, 83, 97, 0.5);
+}
+
+.custom-navbar .btn-danger:active {
+  color: #fff;
+  background-color: #b02a37;
+  border-color: #a52834;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+.custom-navbar .btn-danger:disabled {
+  color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+.btn-primary{
+  background-color: var(--secundary-color) !important;
+  border: var(--secundary-color) !important;
+}
+.custom-navbar .nav-link.active {
+  text-decoration: underline !important; /* Subrayado */
+  font-weight: bold !important; /* Negrita, si lo deseas */
+  color: var(--secundary-color) !important; /* Cambia el color a tu preferencia */
+}
+.animal-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Hace que cada card ocupe el 100% de su contenedor */
+}
+
+/* Mantener las imágenes centradas y del mismo tamaño */
+.card-img-wrapper {
+  width: 100%;
+  height: 300px; /* Ajusta según el tamaño deseado */
+  overflow: hidden; /* Esconde cualquier desbordamiento */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Asegura que las imágenes mantengan la proporción sin distorsión */
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Asegura que la imagen cubra el contenedor sin distorsión */
+}
+
+.animal-card-detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%; /* Hace que cada card ocupe el 100% de su contenedor */
+  margin: 20px;
+}
+
+/* Mantener las imágenes centradas y del mismo tamaño */
+.card-img-wrapper-detail {
+  width: 100%;
+  max-height: 900px;
+  overflow: hidden; /* Esconde cualquier desbordamiento */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Asegura que las imágenes mantengan la proporción sin distorsión */
+.card-img-detail {
+  width: auto;
+  height: auto;
+  object-fit: contain; /* Asegura que la imagen cubra el contenedor sin distorsión */
+}
+ /* .aCuenta{
+  font-weight: bold;
+  color: var(--secundary-color) !important;
+  text-decoration: underline;
+} */
+
+/* Estilos del Login */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.login-box {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;     /* Centra verticalmente si es necesario */
+  margin-bottom: 1.5rem;
+}
+
+.app-logo {
+  width: 80px;
+  height: auto;
+}
+
+.login-title {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.5rem;
+  color: var(--secundary-color) !important;
+  margin-bottom: 1.5rem;
+}
+
+.form-input {
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+}
+
+.login-button {
+  width: 100%;
+  background-color: var(--secundary-color) !important;
+  color: white;
+  font-size: 1.2rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background-color: var(--secundary-color) !important;
+}
+
+.aCuenta {
+  color: var(--secundary-color) !important;
+  text-decoration: none;
+}
+
+.aCuenta:hover {
+  text-decoration: underline;
+  color: var(--secundary-color) !important;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+/* src/styles/NavBar.css */
+.user-dropdown img {
+  border-radius: 50%;
+}
+
+.custom-navbar .dropdown-toggle::after {
+  color: white; /* Opcional: eliminar el ícono de flecha en el dropdown */
+}
+
+.user-dropdown .dropdown-menu {
+  min-width: 200px;
+  text-align: left;
+}
+
+.user-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-dropdown{
+  height:40px !important;
+}
+.fa-circle-user{
+  height: 20px !important;
+}
+/* src/styles/AccountDetails.css */
+.account-details-container {
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top:40px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-details-container h1 {
+  text-align: center;
+}
+
+.account-details-container p {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+/* .btn-danger {
+  display: block;
+  margin: 0 auto;
+} */
+/* AnimalGrid.css */
+.animal-card {
+  border: none; /* Sin borde */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  border-radius: 8px; /* Bordes redondeados */
+}
+
+.card-header {
+  display: flex; /* Usar flexbox para alinear el avatar y el nombre */
+  align-items: center; /* Centrar verticalmente */
+  padding: 10px; /* Espaciado interno */
+}
+
+.avatar {
+  width: 40px; /* Tamaño del avatar */
+  height: 40px; /* Tamaño del avatar */
+  border-radius: 50%; /* Redondear el avatar */
+  margin-right: 10px; /* Espaciado entre avatar y nombre */
+}
+
+.user-name {
+  margin: 0; /* Eliminar márgenes */
+  font-weight: bold; /* Negrita para el nombre */
+}
+
+.button-group {
+  display: flex; /* Usar flexbox para alinear los botones */
+  justify-content: space-between; /* Espaciado entre los botones */
+  margin-top: 10px; /* Espaciado superior */
+}
+.contactButton {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modalTitle {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.infoField {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  color: #555;
+}
+
+.infoFieldWhats{
+  display: flex;
+  justify-content: center;
+  font-size: 18px;
+  color: #555;
+}
+
+.closeButton {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+.whatsapButton {
+  background-color: transparent;
+  color: #25D366;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+.password-recovery-container {
+  padding: 20px;
+
+}
+.password-recovery-container h3{
+  justify-self: center;
+  font-size: 1.45rem;
+  }
+.password-recovery-container form{
+width: 50%;
+justify-self: center;
+}
+
+.password-recovery-container a{
+  float: right;
+}
+.spinn{
+  border: 0.25em solid var(--secundary-color) !important; /* Cambiar a tu color deseado */
+  border-right-color: transparent !important;
+  --bs-spinner-width: 3rem !important;
+    --bs-spinner-height: 3rem !important;
+}
+.social-login-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.facebook-login-btn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.facebook-login-btn:hover {
+  background-color: #145dbf;
+}
