@@ -40,51 +40,53 @@ const [user, setUser]=React.useState(null);
     },
   });
 
-  // Configuración de inicio de sesión de Google
-  useEffect(() => {
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleLogin,
-    });
+  const handleGoogleLoginSuccess = async (response) => {
+    console.log('Google login success', response);
+    const { tokenId } = response;
 
-    window.google.accounts.id.renderButton(
-      document.getElementById('google-login-btn'),
-      { theme: 'outline', size: 'large' }
-    );
-  }, []);
-
-  // Manejo de inicio de sesión con Google
-  const handleGoogleLogin = (response) => {
-    console.log('Google login response', response);
-    setUser({ idToken: response.credential, platform: 'Google' });
-    setIsAuthenticated(true);
+    // Enviar el token de Google al backend para su validación
+    try {
+      const res = await axios.post('http://localhost:4000/auth/google', { token: tokenId });
+      const { token, user } = res.data;
+      localStorage.setItem('tokenn', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setIsAuthenticated(true);
+      navigate('/'); // Redirigir al dashboard
+    } catch (error) {
+      setError('Error al autenticar con Google');
+    }
   };
 
-  // Manejo de inicio de sesión con Facebook
-  useEffect(() => {
-    window.fbAsyncInit = function () {
-      window.FB.init({
-        appId: FACEBOOK_CLIENT_ID,
-        cookie: true,
-        xfbml: true,
-        version: 'v14.0',
-      });
-    };
-  }, []);
-
-  const handleFacebookLogin = () => {
-    window.FB.login(
-      (response) => {
-        if (response.status === 'connected') {
-          setUser({ accessToken: response.authResponse.accessToken, platform: 'Facebook' });
-          setIsAuthenticated(true);
-        } else {
-          console.log('Facebook login failed', response);
-        }
-      },
-      { scope: 'public_profile,email' }
-    );
+  const handleGoogleLoginFailure = (response) => {
+    console.error('Google login failed', response);
+    setError('Error al iniciar sesión con Google');
   };
+
+  // // Manejo de inicio de sesión con Facebook
+  // useEffect(() => {
+  //   window.fbAsyncInit = function () {
+  //     window.FB.init({
+  //       appId: FACEBOOK_CLIENT_ID,
+  //       cookie: true,
+  //       xfbml: true,
+  //       version: 'v14.0',
+  //     });
+  //   };
+  // }, []);
+
+  // const handleFacebookLogin = () => {
+  //   window.FB.login(
+  //     (response) => {
+  //       if (response.status === 'connected') {
+  //         setUser({ accessToken: response.authResponse.accessToken, platform: 'Facebook' });
+  //         setIsAuthenticated(true);
+  //       } else {
+  //         console.log('Facebook login failed', response);
+  //       }
+  //     },
+  //     { scope: 'public_profile,email' }
+  //   );
+  // };
 
   return (
     <Container className="login-container">
@@ -141,12 +143,16 @@ const [user, setUser]=React.useState(null);
         <p className="mt-3 text-center">
         Al iniciar sesión, aceptas nuestra <Link to="/politica-de-privacidad">Política de Privacidad</Link>.
       </p>
-        {/* Botones de inicio de sesión de Google y Facebook */}
-        <div className="social-login-buttons mt-4">
-          <div id="google-login-btn"></div>
-          <button onClick={handleFacebookLogin} className="facebook-login-btn">
-            Iniciar sesión con Facebook
-          </button>
+ {/* Agregar botón de Google Sign-In */}
+ <div className="social-login-buttons mt-4">
+          <GoogleLogin
+            clientId={GOOGLE_CLIENT_ID}  // Tu CLIENT_ID de Google
+            buttonText="Iniciar sesión con Google"
+            onSuccess={handleGoogleLoginSuccess}
+            onFailure={handleGoogleLoginFailure}
+            cookiePolicy="single_host_origin"
+            theme="outline"  // Estilo del botón
+          />
         </div>
       </div>
     </Container>
