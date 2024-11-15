@@ -153,6 +153,7 @@ const [user, setUser]=React.useState(null);
             onSuccess={handleGoogleLoginSuccess}
             onFailure={handleGoogleLoginFailure}
             cookiePolicy="single_host_origin"
+            redirectUri="http://localhost:3000"
             theme="outline"  // Estilo del botón
           />
         </div>
