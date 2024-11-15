@@ -26,7 +26,7 @@ function App() {
   };
 
   return (
-    <Router basename="/FindYourFriend">
+    <Router basename="/adoption">
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' } } >
         <NavBar  isAuthenticated={isAuthenticated} onSearch={handleSearch} onSearchImg={handleSearchImg} />
         <div style={{ flex: 1 }}>

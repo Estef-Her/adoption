@@ -6,6 +6,8 @@ import * as yup from 'yup';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../images/logo.png';
 import { GOOGLE_CLIENT_ID,FACEBOOK_CLIENT_ID } from 'Clases/Constantes';
+import { GoogleLogin } from 'react-google-login';
+
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
   email: yup.string().email('Correo electrónico inválido').required('El correo electrónico es requerido'),
