@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Card, Button, Container, Row, Col } from 'react-bootstrap';
+import { Card, Button, Container, Row, Col ,Form } from 'react-bootstrap';
 import Perro from 'Clases/entidades/perro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye,faMessage } from '@fortawesome/free-solid-svg-icons';
+import { faEye,faMessage,faSpinner,faClose, faFilter, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import logo from '../images/logo.png';
 import Modal from 'react-modal';
 import Contacto from './Contacto';
+import {OPCIONES_TAMANO,OPCIONES_ESTADO} from '../Clases/Constantes'
 
 function Home({ searchTerm, searchImg}) {
   const [animals, setAnimals] = useState([]);
   const [filteredAnimals, setFilteredAnimals] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [animalC, setAnimalC] = useState(null);
-  Modal.setAppElement('#root');
+  const [visibleCount, setVisibleCount] = useState(5); // Inicialmente muestra 10
+  const [incremento, setIncremento] = useState(10); // Inicialmente muestra 10
+  const [selectedSize, setSelectedSize] = useState('0');
+  const [selectedState, setSelectedState] = useState('0');
+  const [comboTamano, setComboTamano] = useState([]);
+  const [comboEstado, setComboEstado] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
+
   const openModal = (animalR) => {
     setAnimalC(animalR);
     setModalIsOpen(true);
@@ -28,9 +36,27 @@ function Home({ searchTerm, searchImg}) {
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);
+        setComboEstado(OPCIONES_ESTADO);
+        setComboTamano(OPCIONES_TAMANO);
       })
       .catch(error => console.error(error));
   }, []);
+  const handleLoadMore = () => {
+    setVisibleCount((prevCount) => prevCount + incremento); // Incrementa de 10 en 10
+  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 50 // 50px antes del final
+      ) {
+        handleLoadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [filteredAnimals, visibleCount]);
   // useEffect(() => {
   //   if (searchTerm === '') {
   //     setFilteredAnimals(animals);
@@ -56,6 +82,21 @@ function Home({ searchTerm, searchImg}) {
   //     setFilteredAnimals(filtered);
   //   }
   // }, [searchTerm, animals]);
+  const cambioComboEstado = (value) => {
+    setSelectedState(value); // Actualiza el estado de selectedState
+    const filtro = animals.filter(animal => 
+      (animal.estadoAdopcion.toString() === value) 
+    );
+    setFilteredAnimals(filtro);
+  };
+  
+  const cambioComboTamano = (value) => {
+    setSelectedSize(value); // Actualiza el estado de selectedSize
+    const filtro = animals.filter(animal => 
+      (animal.tamano.toString() === value) 
+    );
+    setFilteredAnimals(filtro);
+  };
   useEffect(() => {
     if (searchTerm === '') {
       setFilteredAnimals(animals);
@@ -86,7 +127,90 @@ function Home({ searchTerm, searchImg}) {
   }, [searchTerm,searchImg, animals]);
 
   return (
-<Container>
+    <Container style={{ padding: 15}} fluid className="container-custom">
+<Row className="mt-4">
+      <Col md={12} className="bg-light p-3 rounded shadow-sm">
+        {/* Header con el botón para mostrar/ocultar */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="mb-0">Filtros</h5>
+          <Button
+            variant="link"
+            onClick={() => setShowFilters(!showFilters)}
+            className="text-decoration-none"
+          >
+            <FontAwesomeIcon icon={showFilters ? faChevronUp : faChevronDown} />{" "}
+            {showFilters ? "Ocultar" : "Mostrar"}
+          </Button>
+        </div>
+
+        {/* Contenido de los filtros */}
+        {showFilters && (
+          <>
+            {/* Botón para borrar filtros */}
+            {(selectedSize !== "0" || selectedState !== "0") && (
+              <Button
+                variant="secondary"
+                className="mb-3"
+                onClick={() => {
+                  setSelectedSize("0");
+                  setSelectedState("0");
+                  setFilteredAnimals(animals); // Restablece la lista completa
+                }}
+              >
+                Borrar Todo{" "}
+                <FontAwesomeIcon
+                  icon={faClose}
+                  style={{ color: "white", marginLeft: 5 }}
+                />
+              </Button>
+            )}
+
+            {/* Controles de filtros en fila */}
+            <Form>
+              <div className="d-flex flex-wrap gap-3">
+                <div className="flex-grow-1">
+                  <Form.Label className="fw-bold">Tamaño</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={selectedSize}
+                    onChange={(e) => {
+                      console.log("Cambio Tamaño", e.target.value);  // Verifica si se ejecuta el evento
+                      cambioComboTamano(e.target.value);
+                    }}
+                    className="form-select"
+                  >
+                    {comboTamano.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </div>
+
+                <div className="flex-grow-1">
+                  <Form.Label className="fw-bold">Estado</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={selectedState}
+                    onChange={(e) => {
+                      console.log("Cambio Estado", e.target.value);  // Verifica si se ejecuta el evento
+                      cambioComboEstado(e.target.value);
+                    }}
+                    className="form-select"
+                  >
+                    {comboEstado.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </div>
+              </div>
+            </Form>
+          </>
+        )}
+      </Col>
+    </Row>
       <Row className="mt-4">
         {filteredAnimals.map(animal => (
           <Col md={4} key={animal.id}>
@@ -129,12 +253,19 @@ function Home({ searchTerm, searchImg}) {
           </Col>
         ))}
       </Row>
-      <Contacto
-        animalC={animalC}
-        modalIsOpen={modalIsOpen}
-        closeModal={closeModal}
-      />
-    </Container>
+      {visibleCount < filteredAnimals.length && (
+      <div className="text-center mt-4">
+        <Button onClick={handleLoadMore} variant="secondary">
+          <FontAwesomeIcon icon={faSpinner} style={{ color: 'white' }} /> Cargar más
+        </Button>
+      </div>
+    )}
+    <Contacto
+      animalC={animalC}
+      modalIsOpen={modalIsOpen}
+      closeModal={closeModal}
+    />
+  </Container>
   );
 }
 export default Home;
