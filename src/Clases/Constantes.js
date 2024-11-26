@@ -33,3 +33,18 @@ export const MODAL_STYLES = {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 };
+
+export const OPCIONES_TAMANO = [
+  { value: "0", label: "Seleccione un tamaño" },
+  { value: "1", label: "Pequeño" },
+  { value: "2", label: "Mediano" },
+  { value: "3", label: "Grande" },
+  { value: "4", label: "Muy Grande" },
+];
+export const OPCIONES_ESTADO = [
+  { value: "0", label: "Seleccione el estado" },
+  { value: "1", label: "En adopción" },
+  { value: "2", label: "Adoptado" },
+  { value: "3", label: "Perdido" },
+  { value: "4", label: "Encontrado" },
+];
