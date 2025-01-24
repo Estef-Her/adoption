@@ -145,18 +145,6 @@ const [user, setUser]=React.useState(null);
         <p className="mt-3 text-center">
         Al iniciar sesión, aceptas nuestra <Link to="/politica-de-privacidad">Política de Privacidad</Link>.
       </p>
- {/* Agregar botón de Google Sign-In */}
- <div className="social-login-buttons mt-4">
-          <GoogleLogin
-            clientId={GOOGLE_CLIENT_ID}  // Tu CLIENT_ID de Google
-            buttonText="Iniciar sesión con Google"
-            onSuccess={handleGoogleLoginSuccess}
-            onFailure={handleGoogleLoginFailure}
-            cookiePolicy="single_host_origin"
-            redirectUri="http://localhost:3000"
-            theme="outline"  // Estilo del botón
-          />
-        </div>
       </div>
     </Container>
   );

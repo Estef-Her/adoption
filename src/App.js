@@ -11,6 +11,8 @@ import Logout from './pages/Logout';
 import Registro from 'pages/Registro';
 import Cuenta from 'pages/Cuenta';
 import RecuperarContrasena from 'pages/RecuperarContrasena';
+import UsuariosCRUD from 'pages/UsuariosCRUD';
+import RegistroUsuario from 'pages/RegistroUsuario';
 import ModificarAnimal from 'pages/ModificarAnimal';
 import PrivacyPolicy from 'pages/PrivacyPolicy';
 function App() {
@@ -36,6 +38,8 @@ function App() {
             <Route path="/publicar" element={<PublishAnimal />} />
             <Route path="/modificarAnimal/:id" element={<ModificarAnimal />} />
             <Route path="/publicaciones" element={<MisPublicaciones />} />
+            <Route path="/usuarios" element={<UsuariosCRUD />} />
+            <Route path="/usuariosRegistro" element={<RegistroUsuario />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/cuenta" element={<Cuenta />} />
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />

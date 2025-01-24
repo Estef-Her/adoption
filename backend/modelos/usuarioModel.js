@@ -60,6 +60,15 @@ const createUsuario = (usuarioData, callback) => {
     return callback(error, null); // Error de validación
   }
 };
+function generarContrasena() {
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
+  let contrasena = '';
+  for (let i = 0; i < 8; i++) {
+    const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
+    contrasena += caracteres[indiceAleatorio];
+  }
+  return contrasena;
+}
 function getUsuarioByEmail(email, callback) {
   try {
     const query = "SELECT * FROM usuario WHERE correo = ?";
@@ -148,5 +157,6 @@ module.exports = {
   getUsuarioByEmail,
   saveRecoveryCode,
   verifyRecoveryCode,
-  actualizarContrasena
+  actualizarContrasena,
+  generarContrasena
 };

@@ -10,6 +10,7 @@ function Cuenta() {
       {user ? (
         <>
           <p><strong>Nombre:</strong> {user.name}</p>
+          <p><strong>Rol:</strong> {user.rol}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Telefono:</strong> {user.phone}</p>
         </>

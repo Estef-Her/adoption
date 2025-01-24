@@ -132,8 +132,9 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/" className={location.pathname === '/' ? 'active' : ''}>Inicio</Nav.Link>
-            {isAuthenticated && <Nav.Link  as={Link} to="/publicar" className={location.pathname === '/publicar' ? 'active' : ''}>Publicar</Nav.Link>}
-            {isAuthenticated && <Nav.Link as={Link} to="/publicaciones" className={location.pathname === '/publicaciones' ? 'active' : ''}>Mis publicaciones</Nav.Link>}
+            {isAuthenticated && user.rol!==1 && <Nav.Link  as={Link} to="/publicar" className={location.pathname === '/publicar' ? 'active' : ''}>Publicar</Nav.Link>}
+            {isAuthenticated && user.rol!==1 && <Nav.Link as={Link} to="/publicaciones" className={location.pathname === '/publicaciones' ? 'active' : ''}>Mis publicaciones</Nav.Link>}
+            {isAuthenticated && user.rol===1 && <Nav.Link as={Link} to="/usuarios" className={location.pathname === '/usuarios' ? 'active' : ''}>Usuarios</Nav.Link>}
             {!isAuthenticated && <Nav.Link as={Link} to="/login" className={location.pathname === '/login' ? 'active' : ''}>Iniciar Sesión</Nav.Link>}
             {!isAuthenticated && <Nav.Link as={Link} to="/registro" className={location.pathname === '/registro' ? 'active' : ''}>Crear cuenta</Nav.Link>}
             {/* {isAuthenticated && <Nav.Link as={Link} to="/logout" className={location.pathname === '/logout' ? 'active' : ''}>Cerrar Sesión</Nav.Link>} */}

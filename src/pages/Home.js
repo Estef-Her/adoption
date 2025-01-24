@@ -83,17 +83,35 @@ function Home({ searchTerm, searchImg}) {
   //   }
   // }, [searchTerm, animals]);
   const cambioComboEstado = (value) => {
-    setSelectedState(value); // Actualiza el estado de selectedState
+    var tam=selectedSize;
+    var est=value;
+
+    setSelectedState(est); // Actualiza el estado de selectedState
     const filtro = animals.filter(animal => 
-      (animal.estadoAdopcion.toString() === value) 
+    {
+      var condicion = true;
+      condicion = tam!=="0" && est !=="0" ? (animal.estadoAdopcion.toString() === est && animal.tamano.toString() === tam) : 
+      tam!=="0" && est ==="0" ? (animal.tamano.toString() === tam) :
+      tam==="0" && est !=="0" ? (animal.estadoAdopcion.toString() === est) : true;
+      return condicion;
+    }
     );
     setFilteredAnimals(filtro);
   };
   
   const cambioComboTamano = (value) => {
-    setSelectedSize(value); // Actualiza el estado de selectedSize
+    var tam=value;
+    var est=selectedState;
+
+    setSelectedSize(tam); // Actualiza el estado de selectedState
     const filtro = animals.filter(animal => 
-      (animal.tamano.toString() === value) 
+    {
+      var condicion = true;
+      condicion = tam!=="0" && est !=="0" ? (animal.estadoAdopcion.toString() === est && animal.tamano.toString() === tam) : 
+      tam!=="0" && est ==="0" ? (animal.tamano.toString() === tam) :
+      tam==="0" && est !=="0" ? (animal.estadoAdopcion.toString() === est) : true;
+      return condicion;
+    }
     );
     setFilteredAnimals(filtro);
   };

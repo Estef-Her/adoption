@@ -298,6 +298,7 @@ app.post("/login", (req, res) => {
         email: user.correo,
         name: user.nombre,
         phone: user.telefono,
+        rol:user.rol
       },
     });
   });
@@ -346,8 +347,8 @@ app.get("/razas", (req, res) => {
 
 //Usuario
 app.post("/registroUsuario", (req, res) => {
-  const { nombre, telefono, correo, contrasena } = req.body;
-  const nuevoUsuario = { nombre, telefono, correo, contrasena };
+  const { nombre, telefono, correo, contrasena,rol } = req.body;
+  const nuevoUsuario = { nombre, telefono, correo, contrasena ,rol};
 
   // Crear el usuario en la base de datos
   usuarioModel.createUsuario(nuevoUsuario, (err, usuarioCreado) => {
@@ -357,6 +358,50 @@ app.post("/registroUsuario", (req, res) => {
     res
       .status(201)
       .json({ message: "Usuario creado exitosamente", usuario: usuarioCreado });
+  });
+});
+app.get("/usuarios", (req, res) => {
+  usuarioModel.getAllUsuarios((err, usuarios) => {
+    if (err) {
+      return res.status(500).json({ error: "Error al obtener los usuarios" });
+    }
+
+    res.json(usuarios);
+  });
+});
+//Usuario por administrador
+app.post("/registroUsuarioAd",async (req, res) => {
+  const { nombre, telefono, correo,rol } = req.body;
+  var contrasena = usuarioModel.generarContrasena();
+  const nuevoUsuario = { nombre, telefono, correo, contrasena ,rol};
+  // Crear el usuario en la base de datos
+  usuarioModel.createUsuario(nuevoUsuario, async (err, usuarioCreado) => {
+    if (err) {
+      return res.status(500).json({ error: "Error al crear el usuario" });
+    }
+    try {
+      // Crear un token para el restablecimiento de la contraseña
+      // const token = tokenInstance.generarToken(usuario);
+      const recoveryCode = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
+
+      await EnvioCorreo.sendPasswordRecoveryEmail(nuevoUsuario.correo, contrasena);
+      res
+      .status(201)
+      .json({ message: "Usuario creado exitosamente", usuario: usuarioCreado });
+    } catch (error) {
+      return res.status(200).json({ message: "Error al enviar el correo",error:true });
+    }
+  });
+});
+app.get("/usuarios", (req, res) => {
+  usuarioModel.getAllUsuarios((err, usuarios) => {
+    if (err) {
+      return res.status(500).json({ error: "Error al obtener los usuarios" });
+    }
+
+    res.json(usuarios);
   });
 });
 
@@ -464,6 +509,6 @@ app.post("/restablecer-contrasena", async (req, res) => {
 // Configurar la carpeta de archivos estáticos para las imágenes subidas
 app.use("/uploads", express.static("uploads"));
 
-app.listen(4000, () => {
-  console.log("Server running on port 4000");
+app.listen(4000, '0.0.0.0', () => {
+  console.log('Servidor corriendo en http://0.0.0.0:4000');
 });

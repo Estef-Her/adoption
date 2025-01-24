@@ -32,5 +32,23 @@ const sendPasswordRecoveryEmail = async (email, codigo) => {
     throw new Error('Error al enviar el correo');
   }
 };
+// Función para enviar un correo al crear usuario
+const enviarCorreoRegistro = async (email, contrasena) => {
+  const link = `http://localhost:3000/adoption/login`; // URL de recuperación
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: email,
+    subject: 'Usuario registrado',
+    html: `<p>Usted ha sido registrado en la plataforma encuentra a tu amigo, para ingresar utilice su correo electrónico y esta contraseña provisional: <strong>${contrasena}</strong>. Recuerde crear una nueva contraseña al ingresar a la plataforma.</p>`,
+  };
 
-module.exports = { sendPasswordRecoveryEmail };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Correo de registro enviado');
+  } catch (error) {
+    console.error('Error al enviar el correo: ', error);
+    throw new Error('Error al enviar el correo');
+  }
+};
+
+module.exports = { sendPasswordRecoveryEmail,enviarCorreoRegistro };

@@ -10,10 +10,10 @@ const validationSchema = yup.object().shape({
   nombre: yup.string().required('El nombre es requerido'),
   telefono: yup.string().required('El teléfono es requerido'),
   correo: yup.string().email('Correo electrónico inválido').required('El correo electrónico es requerido'),
-  contrasena: yup.string().min(8, 'La contraseña debe tener al menos 8 caracteres').required('La contraseña es requerida'),
+  rol: yup.string().required('El rol es requerido'),
 });
 
-function Registro() {
+function RegistroUsuario() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -23,14 +23,14 @@ function Registro() {
       telefono: '',
       correo: '',
       contrasena: '',
-      rol:2
+      rol:''
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
         const response = await axios.post('http://localhost:4000/registroUsuario', values);
         if (response.status === 201) {
-          navigate('/login'); // Redirigir al usuario al login después de registrar
+          navigate('/usuarios'); // Redirigir al usuario al listado de usuarios después de registrar
         }
       } catch (error) {
         setError('Error al crear la cuenta. Por favor, intenta de nuevo.');
@@ -39,9 +39,8 @@ function Registro() {
   });
 
   return (
-    <Container className="login-container" style={{}}>
-           <div className="login-box">
-           <h2 className="text-center login-title">Crear cuenta</h2>
+<Container className="mt-4">
+      <h4>Crear usuario</h4>
       {error && <Alert variant="danger">{error}</Alert>}
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group controlId="nombre">
@@ -89,7 +88,23 @@ function Registro() {
           </Form.Control.Feedback>
         </Form.Group>
 
-        <Form.Group controlId="contrasena" className="mt-3">
+         <Form.Group controlId="rol" className="mt-3">
+                  <Form.Label>Rol</Form.Label>
+                  <Form.Select
+                    value={formik.values.rol}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={formik.touched.rol && formik.errors.rol}
+                  >
+                    <option value="0">Seleccione un rol</option>
+                    <option value="1">Administrador</option>
+                    <option value="2">Usuario</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {formik.errors.rol}
+                  </Form.Control.Feedback>
+                </Form.Group>
+        {/* <Form.Group controlId="contrasena" className="mt-3">
           <Form.Label>Contraseña</Form.Label>
           <Form.Control
             type="password"
@@ -102,15 +117,14 @@ function Registro() {
           <Form.Control.Feedback type="invalid">
             {formik.errors.contrasena}
           </Form.Control.Feedback>
-        </Form.Group>
+        </Form.Group> */}
 
         <Button variant="primary" type="submit" className="mt-3 login-button">
           Crear cuenta
         </Button>
       </Form>
-           </div>
     </Container>
   );
 }
 
-export default Registro;
+export default RegistroUsuario;
