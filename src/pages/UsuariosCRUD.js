@@ -6,6 +6,11 @@ import { Card, Button, Container, Row, Col ,Form , Modal,Alert} from 'react-boot
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { ToastContainer, toast } from 'react-toastify';
+import LoaderComponent from 'components/Loader';
+import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faEye } from '@fortawesome/free-solid-svg-icons';
 // Definir un tema personalizado
 createTheme('customTheme', {
   text: {
@@ -26,82 +31,145 @@ const validationSchema = yup.object().shape({
   rol: yup.string().required('El rol es requerido'),
 });
 function UsuariosCRUD() {
+    const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [usersC, setUsersC] = useState([]);
   const [showModal, setShowModal] = useState(false); 
   const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); 
+    const [selectedUser, setSelectedUser] = useState(null);
+
   const formik = useFormik({
     initialValues: {
+      id:0,
       nombre: '',
       telefono: '',
       correo: '',
       contrasena: '',
-      rol:''
+      rol:'',
+      rolD:''
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('http://localhost:4000/registroUsuarioAd', values);
-        if (response.status === 201) {
-          handleModalClose(); // Redirigir al usuario al listado de usuarios después de registrar
+        setLoading(true);
+        if (selectedUser){
+          if(!values.id){
+            values.id = selectedUser.id;
+          }
+          const response = await axios.put('http://localhost:4000/modificarUsuario', values);
+          if (response.status === 201) {
+            toast.success('El usuario ha sido modificado exitosamente!');
+            setLoading(false);
+            handleModalClose(); // Redirigir al usuario al listado de usuarios después de registrar
+            ListarUsuarios();
+          }
+        }else{
+          const response = await axios.post('http://localhost:4000/registroUsuarioAd', values);
+          if (response.status === 201) {
+            toast.success('El usuario ha sido registrado exitosamente!');
+            setLoading(false);
+            handleModalClose(); // Redirigir al usuario al listado de usuarios después de registrar
+            ListarUsuarios();
+          }
         }
       } catch (error) {
-        setError('Error al crear la cuenta. Por favor, intenta de nuevo.');
+        setError('Error al crear el usuario. Por favor, intenta de nuevo.');
+        toast.error('Error al crear el usuario. Por favor, intenta de nuevo.');
+        setLoading(false);
       }
     },
   });
-  useEffect(() => {
+  const ListarUsuarios = ()=>{
     axios.get('http://localhost:4000/usuarios') // Cambia esta URL a tu endpoint
       .then(response => {
         setUsers(response.data);
         setUsersC(response.data)
       })
       .catch(error => console.error(error));
+  }
+  useEffect(() => {
+    ListarUsuarios();
   }, []);
 
-  const handleModalClose = () => {
-    setShowModal(false);
-  }
   const handleModalShow = () => setShowModal(true);
+  const handleVerPublicaciones = (userId) => {
+    navigate('/');
+  }
   const handleDelete = (userId) => {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: 'No podrás recuperar este registro!',
+      text: 'No podrás recuperar este registro y se eliminarán también las publicaciones realizadas por este usuario!',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: 'var(--secundary-color)',
       confirmButtonText: 'Sí, eliminarlo!',
-      cancelButtonText: 'Cancelar',
+      cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:4000/users/${userId}`)
+        axios.delete(`http://localhost:4000/usuario/${userId}`)
           .then(() => {
-            setUsers(users.filter(user => user.id !== userId));
-            Swal.fire('Eliminado!', 'El usuario ha sido eliminado.', 'success');
+            ListarUsuarios();
+            toast.success('El usuario ha sido eliminado exitosamente!'); // Mostrar mensaje emergente
           })
           .catch(error => {
             console.error('Error eliminando el usuario:', error);
-            Swal.fire('Error!', 'No se pudo eliminar el usuario.', 'error');
+            toast.error('No se pudo eliminar el usuario.'); // Mostrar mensaje emergente
           });
       }
     });
   };
-
+  const handleEditModalShow = (user) => {
+    setSelectedUser(user);
+    formik.setValues({
+      nombre: user.nombre,
+      telefono: user.telefono,
+      correo: user.correo,
+      rol: user.rol.id,
+      rolD:user.rol.descripcion
+    });
+    setShowModal(true);
+  };
+  
+  const handleModalClose = () => {
+    setShowModal(false);
+    setSelectedUser(null);
+    formik.resetForm();
+  };
   const columns = [
     { name: 'Nombre', selector: row => row.nombre, sortable: true },
     { name: 'Teléfono', selector: row => row.telefono, sortable: true },
     { name: 'Correo', selector: row => row.correo, sortable: true },
-    { name: 'Rol', selector: row => ((row.rol === 1) ? 'Administrador' : 'Usuario'), sortable: true },
+    { name: 'Rol', selector: row => row.rol.descripcion, sortable: true },
     {
       name: 'Acciones',
       cell: row => (
+        <>
         <button
-          className="btn btn-danger btn-sm"
+          className="btn btn-success btn-sm me-2"  title='Editar registro'   data-bs-toggle="tooltip"
+  data-bs-placement="top"
+          onClick={() => handleEditModalShow(row)}
+        >
+          <FontAwesomeIcon icon={faEdit} style={{ color: 'white' }} />
+          
+        </button>
+        <button
+          className="btn btn-danger btn-sm me-2" title='Eliminar registro'   data-bs-toggle="tooltip"
+  data-bs-placement="top"
           onClick={() => handleDelete(row.id)}
         >
-          Eliminar
+          <FontAwesomeIcon icon={faTrash} style={{ color: 'white' }} />
+          
+        </button> 
+        <button
+          className="btn btn-primary btn-sm me-2"
+          onClick={() => handleVerPublicaciones(row.id)}  title='Ver publicaciones'   data-bs-toggle="tooltip"
+  data-bs-placement="top"
+        >
+        <FontAwesomeIcon icon={faEye} style={{ color: 'white' }} />
         </button>
+      </>
       ),
     },
   ];
@@ -152,6 +220,7 @@ function UsuariosCRUD() {
           />
         }
       />
+      <ToastContainer /> {/* Añade esto para que los toasts se muestren */}
       <Modal show={showModal} onHide={handleModalClose}>
     <Modal.Header closeButton>
       <Modal.Title>Registro de usuario</Modal.Title>
@@ -234,9 +303,11 @@ function UsuariosCRUD() {
             {formik.errors.contrasena}
           </Form.Control.Feedback>
         </Form.Group> */}
-
-        <Button variant="primary" type="submit" className="mt-3 login-button">
-          Registrar
+{loading && (
+  <LoaderComponent/>
+        )}
+        <Button variant="primary" type="submit" className="mt-3 login-button" disabled={loading}>
+          {selectedUser!=null ? "Modificar" : "Registrar"}
         </Button>
       </Form>
     </Modal.Body>

@@ -50,5 +50,22 @@ const enviarCorreoRegistro = async (email, contrasena) => {
     throw new Error('Error al enviar el correo');
   }
 };
+// Función para enviar un correo al modificar un usuario
+const enviarCorreoModificacion = async (email, contrasena) => {
+  const link = `http://localhost:3000/adoption/login`; // URL de recuperación
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: email,
+    subject: 'Usuario modificado',
+    html: `<p>Sus datos han sido modificados en la plataforma encuentra a tu amigo, inicie sesión y verifique.</p>`,
+  };
 
-module.exports = { sendPasswordRecoveryEmail,enviarCorreoRegistro };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Correo de modificación enviado');
+  } catch (error) {
+    console.error('Error al enviar el correo: ', error);
+    throw new Error('Error al enviar el correo');
+  }
+};
+module.exports = { sendPasswordRecoveryEmail,enviarCorreoRegistro,enviarCorreoModificacion };

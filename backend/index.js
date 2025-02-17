@@ -382,11 +382,8 @@ app.post("/registroUsuarioAd",async (req, res) => {
     try {
       // Crear un token para el restablecimiento de la contraseña
       // const token = tokenInstance.generarToken(usuario);
-      const recoveryCode = Math.floor(
-        100000 + Math.random() * 900000
-      ).toString();
 
-      await EnvioCorreo.sendPasswordRecoveryEmail(nuevoUsuario.correo, contrasena);
+      await EnvioCorreo.enviarCorreoRegistro(nuevoUsuario.correo, contrasena);
       res
       .status(201)
       .json({ message: "Usuario creado exitosamente", usuario: usuarioCreado });
@@ -395,6 +392,43 @@ app.post("/registroUsuarioAd",async (req, res) => {
     }
   });
 });
+app.put("/modificarUsuario",async (req, res) => {
+  const { nombre, telefono, correo,rol ,id} = req.body;
+  const nuevoUsuario = { nombre, telefono, correo ,rol,id};
+  // Crear el usuario en la base de datos
+  usuarioModel.modificarUsuario(nuevoUsuario, async (err, usuarioCreado) => {
+    if (err) {
+      return res.status(500).json({ error: "Error al modificar el usuario" });
+    }
+    try {
+      await EnvioCorreo.enviarCorreoModificacion(nuevoUsuario.correo, '');
+      res
+      .status(201)
+      .json({ message: "Usuario modificado exitosamente", usuario: usuarioCreado });
+    } catch (error) {
+      return res.status(200).json({ message: "Error al enviar el correo",error:true });
+    }
+  });
+});
+// Endpoint para eliminar un perro
+app.delete("/usuario/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Llamar a la función en el modelo para eliminar el usuario y los perros asociados
+    await usuarioModel.eliminarUsuario(id, (err) => {
+      if (err) {
+        console.error("Error al eliminar el usuario:", err);
+        return res.status(500).json({ error: "Error al eliminar el usuario." });
+      }
+      res.status(204).send(); // No content
+    });
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+    res.status(500).json({ error: "Error al procesar la solicitud." });
+  }
+});
+
 app.get("/usuarios", (req, res) => {
   usuarioModel.getAllUsuarios((err, usuarios) => {
     if (err) {

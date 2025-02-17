@@ -5,13 +5,38 @@ const bcrypt = require('bcryptjs'); // Si estás usando contraseñas encriptadas
 const saltRounds = 12;
 // Obtener todos los usuarios
 const getAllUsuarios = (callback) => {
-  db.query('SELECT * FROM usuario', (err, results) => {
+  const query = `
+    SELECT 
+      u.id, 
+      u.nombre, 
+      u.telefono, 
+      u.correo, 
+      u.contrasena, 
+      u.rol AS rol_id, 
+      r.nombre AS rol_descripcion
+    FROM 
+      usuario u
+    JOIN 
+      rol r
+    ON 
+      u.rol = r.idrol
+  `;
+
+  db.query(query, (err, results) => {
     if (err) {
       return callback(err, null);
     }
-    callback(null, results.map(row => new Usuario(row.id, row.nombre, row.telefono, row.correo, row.contrasena)));
+    callback(null, results.map(row => new Usuario(
+      row.id, 
+      row.nombre, 
+      row.telefono, 
+      row.correo, 
+      row.contrasena, 
+      { id: row.rol_id, descripcion: row.rol_descripcion }
+    )));
   });
 };
+
 
 // Obtener un usuario por ID
 const getUsuarioById = (id, callback) => {
@@ -59,6 +84,58 @@ const createUsuario = (usuarioData, callback) => {
   } catch (error) {
     return callback(error, null); // Error de validación
   }
+};
+const modificarUsuario = (datos, callback) => {
+  if (typeof callback !== 'function') {
+    throw new Error('El callback proporcionado no es una función');
+  }
+  try{
+    const eliminarPublicacionesQuery = 'DELETE FROM perro WHERE userId = ?';
+  
+  db.query(eliminarPublicacionesQuery, [datos.id], (error) => {
+      if (error) {
+          return callback(error);
+      }
+      console.log("Eliminó las publicaciones asignadas");
+
+      // Actualiza la información del perro
+      const actualizarUsuarioQuery = 'UPDATE usuario SET nombre = ?, telefono = ?, correo = ?, rol = ? WHERE id = ?';
+      
+      db.query(actualizarUsuarioQuery, [datos.nombre,datos.telefono,datos.correo,datos.rol,datos.id], (error, resultado) => {
+          if (error) {
+              return callback(error);
+          }
+          var newUsuario = new Usuario(
+            resultado.insertId, 
+            resultado.nombre, 
+            resultado.telefono, 
+            resultado.correo, 
+            resultado.contrasena, 
+            resultado.rol,
+            []
+          );
+          callback(null, newUsuario);
+      });
+  });
+  } catch (error) {
+    return callback(error, null); // Devuelve un error si la validación falla
+  }
+};
+const eliminarUsuario = (id, callback) => {
+  // Eliminar las publicaciones realizadas
+  db.query('DELETE FROM perro WHERE userId = ?', [id], (err) => {
+    if (err) {
+      return callback(err, null);
+    }
+
+    // Ahora eliminar el usuario
+    db.query('DELETE FROM usuario WHERE id = ?', [id], (err) => {
+      if (err) {
+        return callback(err, null);
+      }
+      callback(null); // El usuario fue eliminado con éxito
+    });
+  });
 };
 function generarContrasena() {
   const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
@@ -158,5 +235,7 @@ module.exports = {
   saveRecoveryCode,
   verifyRecoveryCode,
   actualizarContrasena,
-  generarContrasena
+  generarContrasena,
+  eliminarUsuario,
+  modificarUsuario
 };
