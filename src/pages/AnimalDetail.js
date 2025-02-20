@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams,useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Card,Button  } from 'react-bootstrap';
+import { URL_SERVICIO } from 'Clases/Constantes';
+
 
 function AnimalDetail() {
   const { id } = useParams();
@@ -9,7 +11,7 @@ function AnimalDetail() {
   const navigate = useNavigate(); // Inicializa useNavigate
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/animals/${id}`)
+    axios.get(URL_SERVICIO +`animals/${id}`)
       .then(response => setAnimal(response.data))
       .catch(error => console.error(error));
   }, [id]);

@@ -9,6 +9,7 @@ import logo from '../images/logo.png';
 import Modal from 'react-modal';
 import Contacto from './Contacto';
 import {OPCIONES_TAMANO,OPCIONES_ESTADO} from '../Clases/Constantes'
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 function Home({ searchTerm, searchImg}) {
   const [animals, setAnimals] = useState([]);
@@ -32,7 +33,7 @@ function Home({ searchTerm, searchImg}) {
     setModalIsOpen(false);
   };
   useEffect(() => {
-    axios.get('http://localhost:4000/animals')
+    axios.get(URL_SERVICIO + 'animals')
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);

@@ -7,6 +7,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import logo from '../images/logo.png';
 import { GOOGLE_CLIENT_ID,FACEBOOK_CLIENT_ID } from 'Clases/Constantes';
 import { GoogleLogin } from 'react-google-login';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
@@ -27,7 +28,7 @@ const [user, setUser]=React.useState(null);
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('http://localhost:4000/login', values);
+        const response = await axios.post(URL_SERVICIO + 'login', values);
         const { token, user } = response.data; // Supongamos que el backend devuelve un token y los detalles del usuario
         localStorage.setItem('tokenn', token);
         localStorage.setItem('user', JSON.stringify(user));
@@ -48,7 +49,7 @@ const [user, setUser]=React.useState(null);
 
     // Enviar el token de Google al backend para su validación
     try {
-      const res = await axios.post('http://localhost:4000/auth/google', { token: tokenId });
+      const res = await axios.post(URL_SERVICIO + 'auth/google', { token: tokenId });
       const { token, user } = res.data;
       localStorage.setItem('tokenn', token);
       localStorage.setItem('user', JSON.stringify(user));

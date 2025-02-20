@@ -8,6 +8,7 @@ import TeacheableMachine from '../Clases/TeacheableMachine';
 import LoaderComponent from 'components/Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 const TeacheableMachineInstance = new TeacheableMachine();
 
@@ -60,7 +61,7 @@ function ModificarAnimal() {
   }, [id]);
   useEffect(() => {
     setLoadingAnimal(true);
-    axios.get('http://localhost:4000/razas')
+    axios.get(URL_SERVICIO + 'razas')
       .then(response => {
         setCatalogoRazas(response.data);
         var s = animal ? animal.foto : '';
@@ -107,7 +108,7 @@ function ModificarAnimal() {
         formData.append('imageFile', file);
       }
       // Enviar los datos modificados
-      axios.put('http://localhost:4000/animals', formData, {
+      axios.put(URL_SERVICIO + 'animals', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

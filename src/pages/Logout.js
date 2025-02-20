@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 function Logout({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function Logout({ setIsAuthenticated }) {
 
       // Enviar el token como parte de los encabezados en la solicitud
       await axios.post(
-        'http://localhost:4000/logout', 
+        URL_SERVICIO + 'logout', 
         {}, // No necesitas enviar datos en el cuerpo
         { headers: { Authorization: `Bearer ${token}` } } // Enviar el token en los headers
       );

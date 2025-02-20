@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import LoaderComponent from 'components/Loader';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 const validationSchema = yup.object().shape({
   codigo: yup.string().required('El código es requerido'),
@@ -35,7 +36,7 @@ function RecuperarContrasena() {
         setIsLoading(true);
         console.log("Entro a submit");
         // Realizar una solicitud POST al backend para la recuperación de contraseña
-        const response = await axios.post('http://localhost:4000/solicitar-restablecer', { email: values.email });
+        const response = await axios.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email });
         setMessage(response.data.error==false ? response.data.message || 'Se ha enviado un enlace de recuperación a tu correo electrónico.':'');
         setEmail(values.email);
         setError(response.data.error==true ? response.data.message:'');
@@ -56,7 +57,7 @@ function RecuperarContrasena() {
       try {
         setIsLoading(true);
         // Realizar la solicitud para restablecer la contraseña
-        const response = await axios.post('http://localhost:4000/restablecer-contrasena', {
+        const response = await axios.post(URL_SERVICIO + 'restablecer-contrasena', {
           codigo: values.codigo,
           nuevaContrasena: values.nuevaContrasena,
           email:email

@@ -1,13 +1,19 @@
 // db.js
 const mysql = require('mysql2');
 
-// Configuración de la conexión a la base de datos MySQL
-const db = mysql.createConnection({
-  host: 'localhost', // Cambia esto si tu MySQL está en otro host
-  user: 'root', // Cambia esto si tu usuario no es 'root'
-  password: 'admin', // Cambia esto por tu contraseña
-  database: 'db_findyourfriend' // Cambia esto por el nombre de tu base de datos
-});
+ //Configuración de la conexión a la base de datos MySQL
+  const db = mysql.createConnection({
+    host: 'localhost', // Cambia esto si tu MySQL está en otro host
+    user: 'root', // Cambia esto si tu usuario no es 'root'
+    password: 'admin', // Cambia esto por tu contraseña
+    database: 'db_findyourfriend' // Cambia esto por el nombre de tu base de datos
+  });
+//  const db = mysql.createConnection({
+//    host: '190.113.103.97', // Cambia esto si tu MySQL está en otro host
+//    user: 'estef_db', // Cambia esto si tu usuario no es 'root'
+//    password: 'db_f2iend_4567', // Cambia esto por tu contraseña
+//    database: 'db_findyourfriend' // Cambia esto por el nombre de tu base de datos
+//  });
 
 // Conectar a la base de datos
 db.connect((err) => {

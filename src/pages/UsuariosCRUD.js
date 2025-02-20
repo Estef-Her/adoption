@@ -11,6 +11,7 @@ import LoaderComponent from 'components/Loader';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faEye } from '@fortawesome/free-solid-svg-icons';
+import { URL_SERVICIO } from 'Clases/Constantes';
 // Definir un tema personalizado
 createTheme('customTheme', {
   text: {
@@ -57,7 +58,7 @@ function UsuariosCRUD() {
           if(!values.id){
             values.id = selectedUser.id;
           }
-          const response = await axios.put('http://localhost:4000/modificarUsuario', values);
+          const response = await axios.put(URL_SERVICIO + 'modificarUsuario', values);
           if (response.status === 201) {
             toast.success('El usuario ha sido modificado exitosamente!');
             setLoading(false);
@@ -65,7 +66,7 @@ function UsuariosCRUD() {
             ListarUsuarios();
           }
         }else{
-          const response = await axios.post('http://localhost:4000/registroUsuarioAd', values);
+          const response = await axios.post(URL_SERVICIO + 'registroUsuarioAd', values);
           if (response.status === 201) {
             toast.success('El usuario ha sido registrado exitosamente!');
             setLoading(false);
@@ -81,7 +82,7 @@ function UsuariosCRUD() {
     },
   });
   const ListarUsuarios = ()=>{
-    axios.get('http://localhost:4000/usuarios') // Cambia esta URL a tu endpoint
+    axios.get(URL_SERVICIO + 'usuarios') // Cambia esta URL a tu endpoint
       .then(response => {
         setUsers(response.data);
         setUsersC(response.data)

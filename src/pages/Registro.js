@@ -4,6 +4,7 @@ import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
@@ -28,7 +29,7 @@ function Registro() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post('http://localhost:4000/registroUsuario', values);
+        const response = await axios.post(URL_SERVICIO + 'registroUsuario', values);
         if (response.status === 201) {
           navigate('/login'); // Redirigir al usuario al login después de registrar
         }

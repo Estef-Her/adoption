@@ -8,6 +8,7 @@ import TeacheableMachine from '../Clases/TeacheableMachine';
 import LoaderComponent from 'components/Loader';
 import { faUser, faSignOutAlt, faUserCircle,faTimes } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 const TeacheableMachineInstance = new TeacheableMachine();
 
@@ -24,7 +25,7 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
   const [catalogoRazas, setCatalogoRazas] = useState([]); // Estado para la raza
 
   useEffect(() => {
-    axios.get('http://localhost:4000/razas')
+    axios.get(URL_SERVICIO + 'razas')
       .then(response => {
         setCatalogoRazas(response.data);
       })

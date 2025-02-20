@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import Swal from 'sweetalert2'; // Para las alertas emergentes
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 function MisPublicaciones() {
   const [animals, setAnimals] = useState([]);
@@ -11,7 +12,7 @@ function MisPublicaciones() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     var id=user.id;
-    axios.get(`http://localhost:4000/animalsPorUsuario/${id}`)
+    axios.get(URL_SERVICIO+`animalsPorUsuario/${id}`)
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);
@@ -30,7 +31,7 @@ function MisPublicaciones() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:4000/animals/${animalId}`)
+        axios.delete(URL_SERVICIO+`animals/${animalId}`)
           .then(() => {
             setAnimals(animals.filter(animal => animal.id !== animalId));
             setFilteredAnimals(filteredAnimals.filter(animal => animal.id !== animalId));

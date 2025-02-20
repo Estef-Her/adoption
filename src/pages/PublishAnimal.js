@@ -10,6 +10,7 @@ import TeacheableMachine from '../Clases/TeacheableMachine';
 import LoaderComponent from 'components/Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { URL_SERVICIO } from 'Clases/Constantes';
 
 const TeacheableMachineInstance = new TeacheableMachine();
 
@@ -57,7 +58,7 @@ function PublishAnimal() {
   //   loadModel();
   // }, []);
   useEffect(() => {
-    axios.get('http://localhost:4000/razas')
+    axios.get(URL_SERVICIO + 'razas')
       .then(response => {
         setCatalogoRazas(response.data);
       })
@@ -102,7 +103,7 @@ function PublishAnimal() {
       //   formData.append('image', values.image);
       // }
       // Obtener el token de autenticación
-      axios.post('http://localhost:4000/animals', formData, {
+      axios.post(URL_SERVICIO + 'animals', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
