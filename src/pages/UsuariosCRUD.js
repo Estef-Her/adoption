@@ -95,7 +95,7 @@ function UsuariosCRUD() {
 
   const handleModalShow = () => setShowModal(true);
   const handleVerPublicaciones = (userId) => {
-    navigate('/');
+    navigate(`/publicaciones/${userId}`);
   }
   const handleDelete = (userId) => {
     Swal.fire({

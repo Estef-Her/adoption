@@ -15,6 +15,7 @@ import UsuariosCRUD from 'pages/UsuariosCRUD';
 import RegistroUsuario from 'pages/RegistroUsuario';
 import ModificarAnimal from 'pages/ModificarAnimal';
 import PrivacyPolicy from 'pages/PrivacyPolicy';
+import CambioContrasena from 'pages/CambioContrasena';
 function App() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [searchImg, setSearchImg] = React.useState(null);
@@ -37,7 +38,7 @@ function App() {
             <Route path="/animal/:id" element={<AnimalDetail />} />
             <Route path="/publicar" element={<PublishAnimal />} />
             <Route path="/modificarAnimal/:id" element={<ModificarAnimal />} />
-            <Route path="/publicaciones" element={<MisPublicaciones />} />
+            <Route path="/publicaciones/:id" element={<MisPublicaciones />} />
             <Route path="/usuarios" element={<UsuariosCRUD />} />
             <Route path="/usuariosRegistro" element={<RegistroUsuario />} />
             <Route path="/registro" element={<Registro />} />
@@ -45,6 +46,7 @@ function App() {
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
             <Route path="/logout" element={<Logout setIsAuthenticated={setIsAuthenticated}/>} />
             <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
+            <Route path="/cambio-contrasena" element={<CambioContrasena />} />
             <Route path="/politica-de-privacidad" element={<PrivacyPolicy />} /> {/* Ruta para la política de privacidad */}
           </Routes>
         </div> 

@@ -148,7 +148,21 @@ function generarContrasena() {
 }
 function getUsuarioByEmail(email, callback) {
   try {
-    const query = "SELECT * FROM usuario WHERE correo = ?";
+    const query = `
+    SELECT 
+      u.id, 
+      u.nombre, 
+      u.telefono, 
+      u.correo, 
+      u.contrasena, 
+      u.rol AS rol_id, 
+      r.nombre AS rol_descripcion
+    FROM 
+      usuario u
+    JOIN 
+      rol r
+    ON 
+      u.rol = r.idrol WHERE u.correo = ?`;
     db.query(query, [email], (err, results) => {
       if (err) {
         return callback(err);
@@ -198,6 +212,22 @@ const verifyRecoveryCode = (userId, recoveryCode, callback) => {
     return callback(error, false); // Error inesperado
   }
 };
+const verifyContrasena = (userId, contrasena, callback) => {
+  try{
+    const query = 'SELECT * FROM usuario WHERE id = ?';
+    db.query(query, [userId], (err, results) => {
+      if (err || results.length === 0) return callback(err, false);
+      const user = results[0];
+    if (bcrypt.compareSync(contrasena, user.contrasena)) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+    });
+  }
+  catch(error){
+    return callback(error, false); // Error inesperado
+  }
+};
 function actualizarContrasena(id,contrasena,callback){
   try {
 
@@ -237,5 +267,6 @@ module.exports = {
   actualizarContrasena,
   generarContrasena,
   eliminarUsuario,
-  modificarUsuario
+  modificarUsuario,
+  verifyContrasena
 };

@@ -1,3 +1,4 @@
+const https = require('https');
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -17,7 +18,9 @@ const sharp = require("sharp");
 const rimraf = require("rimraf");
 const EnvioCorreo = require("./modelos/EnvioCorreo");
 
+
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
@@ -298,7 +301,7 @@ app.post("/login", (req, res) => {
         email: user.correo,
         name: user.nombre,
         phone: user.telefono,
-        rol:user.rol
+        rol: { id: user.rol_id, descripcion: user.rol_descripcion }
       },
     });
   });
@@ -383,7 +386,7 @@ app.post("/registroUsuarioAd",async (req, res) => {
       // Crear un token para el restablecimiento de la contraseña
       // const token = tokenInstance.generarToken(usuario);
 
-      await EnvioCorreo.enviarCorreoRegistro(nuevoUsuario.correo, contrasena);
+      await EnvioCorreo.enviarCorreoRegistro(nuevoUsuario.correo, contrasena,usuarioCreado);
       res
       .status(201)
       .json({ message: "Usuario creado exitosamente", usuario: usuarioCreado });
@@ -401,7 +404,7 @@ app.put("/modificarUsuario",async (req, res) => {
       return res.status(500).json({ error: "Error al modificar el usuario" });
     }
     try {
-      await EnvioCorreo.enviarCorreoModificacion(nuevoUsuario.correo, '');
+      await EnvioCorreo.enviarCorreoModificacion(nuevoUsuario.correo, '',nuevoUsuario);
       res
       .status(201)
       .json({ message: "Usuario modificado exitosamente", usuario: usuarioCreado });
@@ -481,7 +484,7 @@ app.post("/solicitar-restablecer", async (req, res) => {
               .status(200)
               .json({ message: "Error al guardar el código de recuperación",error:true });
           }
-          await EnvioCorreo.sendPasswordRecoveryEmail(email, recoveryCode);
+          await EnvioCorreo.sendPasswordRecoveryEmail(email, recoveryCode,usuarioActualizado);
           return res
             .status(200)
             .json({ message: "Correo enviado para restablecer la contraseña",error:false });
@@ -537,6 +540,53 @@ app.post("/restablecer-contrasena", async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({ message: "Código inválido o expirado",error:true });
+  }
+});
+
+// Endpoint para cambiar la contraseña
+app.post("/cambiar-contrasena", async (req, res) => {
+  const { nuevaContrasena,actualContrasena, email } = req.body;
+
+  if (!actualContrasena || !nuevaContrasena) {
+    return res
+      .status(400)
+      .json({ message: "Contraseña actual y nueva contraseña son requeridos",error:true });
+  }
+
+  try {
+    // Buscar al usuario usando el id decodificado
+    usuarioModel.getUsuarioByEmail(email, async (err, user) => {
+      if (err) {
+        if (err.message === "Correo no encontrado") {
+          return res.status(200).json({ message: "Correo no encontrado",error:true });
+        }
+        return res.status(200).json({ message: "Error interno del servidor",error:true });
+      }
+      if (!user) {
+        return res.status(200).json({ message: "Usuario no encontrado",error:true });
+      }
+      usuarioModel.verifyContrasena(user.id, actualContrasena, async (err, isValid) => {
+        if (err || !isValid) {
+          return res
+            .status(200)
+            .json({
+              message: "La contraseña actual es incorrecta",
+            });
+        }
+
+        // Actualizar la contraseña del usuario en la base de datos
+        usuarioModel.actualizarContrasena(user.id, nuevaContrasena, async (err,usuarioMod)=>{
+          if (err) {
+            return res.status(200).json({ message: "Error al guardar la contraseña",error:true });
+          }
+          return res
+          .status(200)
+          .json({ message: "Contraseña cambiada con éxito",error:false });
+        });
+      });
+    });
+  } catch (error) {
+    return res.status(400).json({ message: "Contraseña incorrecta",error:true });
   }
 });
 

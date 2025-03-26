@@ -4,15 +4,17 @@ import { Link } from 'react-router-dom';
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import Swal from 'sweetalert2'; // Para las alertas emergentes
 import { URL_SERVICIO } from 'Clases/Constantes';
+import { useParams } from 'react-router-dom';
 
 function MisPublicaciones() {
+  const { id } = useParams();
   const [animals, setAnimals] = useState([]);
   const [filteredAnimals, setFilteredAnimals] = useState([]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-    var id=user.id;
-    axios.get(URL_SERVICIO+`animalsPorUsuario/${id}`)
+    var ide=id!=null && id != "0"? id : user.id;
+    axios.get(URL_SERVICIO+`animalsPorUsuario/${ide}`)
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);

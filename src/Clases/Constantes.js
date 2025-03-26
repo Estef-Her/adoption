@@ -6,8 +6,8 @@ export const API_BASE_URL = "https://api.ejemplo.com";
 export const WHATSAPP_BASE_URL = "https://wa.me/";
 export const GOOGLE_CLIENT_ID = "617032070306-9rtq6s4vc3uhp66lv3fdhf1qvg6dv2jd.apps.googleusercontent.com";
 export const FACEBOOK_CLIENT_ID = "";
- //export const URL_SERVICIO="http://localhost:4000/";
-export const URL_SERVICIO="http://190.113.103.97:4000/";
+ export const URL_SERVICIO="http://localhost:4000/";
+// export const URL_SERVICIO="http://190.113.103.97:4000/";
 
 // Mensajes predeterminados
 export const MESSAGES = {
