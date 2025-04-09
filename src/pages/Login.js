@@ -134,18 +134,13 @@ const [user, setUser]=React.useState(null);
           <Button variant="primary" type="submit" className="mt-3 login-button">
             Iniciar sesión
           </Button>
-
           <p className="mt-3 text-center">
             ¿No tienes una cuenta? <Link className="aCuenta" to="/registro">Crear cuenta</Link>
           </p>
-
           <p className="mt-3 text-center">
             <Link className="aCuenta" to="/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
           </p>
         </Form>
-        <p className="mt-3 text-center">
-        Al iniciar sesión, aceptas nuestra <Link to="/politica-de-privacidad">Política de Privacidad</Link>.
-      </p>
       </div>
     </Container>
   );

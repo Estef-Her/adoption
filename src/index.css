@@ -473,3 +473,10 @@ justify-self: center;
 .searchTabla{
   width: 300px !important;
 }
+.animal-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Número de líneas */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

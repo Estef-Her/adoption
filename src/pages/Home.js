@@ -250,7 +250,11 @@ function Home({ searchTerm, searchImg}) {
               </div>
               <Card.Body>
                 <Card.Title className="animal-title">{animal.nombre}</Card.Title>
-                <Card.Text className="animal-description">{animal.descripcion}</Card.Text>
+                <Card.Text className="animal-description">
+  {animal.descripcion.length > 30 
+    ? animal.descripcion.slice(0, 30) + "..." 
+    : animal.descripcion}
+</Card.Text>
                 <Card.Text className="animal-breed">
                   {animal.estadoAdopcion === 1 ? "En adopción" : animal.estadoAdopcion === 2 ? "Adoptado" : animal.estadoAdopcion === 3 ? "Perdido" : animal.estadoAdopcion === 4 ? "Encontrado" : ""}
                 </Card.Text>

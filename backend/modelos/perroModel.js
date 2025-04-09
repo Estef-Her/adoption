@@ -49,7 +49,6 @@ const getAllPerros = (callback) => {
           nombreUsuario:row.nombreUsuario
         });
       }
-
       // Si hay una raza asociada, la añadimos al array de razas
       if (row.razaNombre) {
         perrosMap.get(perroId).razas.push({

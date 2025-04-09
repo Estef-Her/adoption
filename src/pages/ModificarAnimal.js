@@ -52,6 +52,7 @@ function ModificarAnimal() {
         setAnimal(response.data);
         setImageFile(response.data.foto);
         setLoadingAnimal(false);
+        console.log(response.data);
       })
       .catch(error => {
         console.error('Error fetching animal:', error);
