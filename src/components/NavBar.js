@@ -1,20 +1,26 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect,useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container, Form, FormControl, Button ,Modal,Dropdown  } from 'react-bootstrap';
 import { faClose, faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import logo from '../images/logo.png';
 import TeacheableMachine from '../Clases/TeacheableMachine';
+import DeteccionImagen from '../Clases/DeteccionImagen';
 import LoaderComponent from 'components/Loader';
-import { faUser, faSignOutAlt, faUserCircle,faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSignOutAlt, faUserCircle,faTimes,faTruckLoading } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
+
 
 const TeacheableMachineInstance = new TeacheableMachine();
+const DeteccionImagenInstance = new DeteccionImagen();
 
 function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const imageRef = useRef(null);
   const location = useLocation(); // Obtenemos la ubicación actual
   const [showModal, setShowModal] = useState(false); 
   const [loading, setLoading] = useState(false); 
@@ -23,6 +29,43 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
   const [catalogoRazas, setCatalogoRazas] = useState([]); // Estado para la raza
+  const [modCargado, setModCargado] = useState(true);  
+  const [validationMessage, setValidationMessage] = useState('');
+
+    useEffect(() => {
+      const waitForModels = async () => {
+        await new Promise((resolve) => {
+          const checkModels = () => {
+            if (
+              TeacheableMachineInstance.getModel() &&
+              DeteccionImagenInstance.getModel()
+            ) {
+              resolve();
+            } else {
+              // Revisa periódicamente si ya se cargaron los modelos
+              const interval = setInterval(() => {
+                if (
+                  TeacheableMachineInstance.getModel() &&
+                  DeteccionImagenInstance.getModel()
+                ) {
+                  clearInterval(interval);
+                  resolve();
+                }
+              }, 300); // revisa cada 300ms
+            }
+          };
+    
+          checkModels();
+        });
+    
+        // Espera un pequeño tiempo adicional (opcional)
+        setTimeout(() => {
+          setModCargado(false);
+        }, 500);
+      };
+    
+      waitForModels();
+    }, []);
 
   useEffect(() => {
     axios.get(URL_SERVICIO + 'razas')
@@ -60,26 +103,64 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
     setImageFile(null);
   };
   const handleModalShow = () => setShowModal(true);
-    // Manejar la selección de archivo
-    const handleFileChange = (event) => {
-      setLoading(true); // Inicia la carga
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setImageFile(e.target.result);
-          validateImage(e.target.result);
+
+  const handleFileChange = (event) => {
+    setLoading(true);
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target.result;
+        setImageFile(imageData);
+  
+        // Crear imagen temporal solo para detectar carga completa
+        const tempImg = new Image();
+        tempImg.src = imageData;
+        tempImg.onload = () => {
+          validateImage(imageData);
         };
-        reader.readAsDataURL(file);
-      }else{
-        setImageFile(null);
-        setLoading(false);
-      }
-    };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+    // // Manejar la selección de archivo
+    // const handleFileChange = (event) => {
+    //   setLoading(true); // Inicia la carga
+    //   const file = event.target.files[0];
+    //   if (file) {
+    //     const reader = new FileReader();
+    //     reader.onload = (e) => {
+    //       setImageFile(e.target.result);
+    //       validateImage(e.target.result);
+    //     };
+    //     reader.readAsDataURL(file);
+    //   }else{
+    //     setImageFile(null);
+    //     setLoading(false);
+    //   }
+    // };
     // Validar la imagen con el modelo de Teachable Machine
     const validateImage = async (imageSrc) => {
       setLoading(true); // Inicia la carga
+      if(DeteccionImagenInstance.getModel() && imageRef.current){
+        await new Promise((resolve) => {
+          if (imageRef.current.complete) resolve();
+          else imageRef.current.onload = resolve;
+        });
+        const hayPerro = await DeteccionImagenInstance.handlePredict(imageRef.current);
+  
+        if (!hayPerro) {
+          setRaza([]);
+          setRazaString("");
+          setImageFile(null);           // Limpiar imagen
+          imageRef.current = null;      
+          setValidationMessage('No se detectó un perro en la imagen. Por favor, suba una imagen válida, o intente probar con una toma diferente.');
+          setLoading(false);
+          return; // No continuar si no hay perro
+        }
+      }
       if (TeacheableMachineInstance.getModel() && imageSrc) {
+        setValidationMessage("");
         const imgElement = document.createElement("img");
         imgElement.src = imageSrc;
         imgElement.onload = async () => {
@@ -113,6 +194,7 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
       localStorage.removeItem('user');
       navigate('/login'); // Redirigir al login tras cerrar sesión
     };
+
   return (
     <>
     <Navbar className="custom-navbar" expand="lg">
@@ -149,28 +231,31 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-<Button 
-  variant={raza.length > 0 ? "danger" : "light"} // Cambia el color del botón a rojo si hay filtros
-  className="me-2 position-relative" 
-  onClick={raza.length > 0 ? handleClearFilter : handleModalShow}
->
-  <FontAwesomeIcon icon={faImage} style={{ color: 'white' }} /> {/* Icono para cargar imagen */}
-
-  {raza.length > 0 && (
-    <FontAwesomeIcon 
-      icon={faTimes} 
-      style={{
-        position: 'absolute', 
-        top: '0', 
-        right: '0', 
-        fontSize: '0.7rem', // Tamaño pequeño para la X
-        color: 'white',
-        cursor: 'pointer',
-      }} 
-      onClick={handleClearFilter} // Borra el filtro al hacer clic en la X
-    />
-  )}
-</Button>
+            <span title={modCargado ? "Se están cargando los elementos necesarios" : ""}>
+            <Button
+      variant={raza.length > 0 ? "danger" : "light"}
+      className="me-2 position-relative"
+      disabled={modCargado}
+      onClick={raza.length > 0 ? handleClearFilter : handleModalShow}
+      style={modCargado ? { pointerEvents: 'none' } : {}}
+    >
+      <FontAwesomeIcon icon={faImage} style={{ color: 'white' }} />
+      {raza.length > 0 && (
+        <FontAwesomeIcon
+          icon={faTimes}
+          style={{
+            position: 'absolute',
+            top: '0',
+            right: '0',
+            fontSize: '0.7rem',
+            color: 'white',
+            cursor: 'pointer',
+          }}
+          onClick={handleClearFilter}
+        />
+      )}
+    </Button>
+            </span>
             <Button variant="outline-light" type="submit">Buscar</Button>
           </Form>
           {isAuthenticated && (
@@ -215,12 +300,15 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
           />
         </Form.Group>
 
-        {imageFile && <img src={imageFile} alt="Uploaded" style={{ marginTop: '20px', maxWidth: '300px' }} />}
+        {imageFile && <img src={imageFile} ref={imageRef} alt="Uploaded" style={{ marginTop: '20px', maxWidth: '300px' }} />}
          {raza!=="" > 0 && (
           <div id="label-container" style={{ marginTop: '20px' }}>
             <p>{razaString}</p>
           </div>
-        )} 
+        )}
+        {validationMessage && (
+  <p style={{ color: 'red', marginTop: '10px' }}>{validationMessage}</p>
+)} 
 {loading && (
   <LoaderComponent/>
         )}

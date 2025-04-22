@@ -480,3 +480,10 @@ justify-self: center;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.custom-tooltip {
+  background-color: transparent !important; /* Azul */
+  color: black  !important;
+  font-size: 0.875rem  !important;
+  border-radius: 8px  !important;
+  padding: 8px 12px  !important;
+}

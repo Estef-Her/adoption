@@ -154,3 +154,10 @@ button {
   display: block;
   margin: 0 auto;
 }
+.custom-tooltip {
+  background-color: #1e90ff !important; /* Azul */
+  color: white;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  padding: 8px 12px;
+}

@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import axios from 'axios';
 import { Container, Form, Button, Spinner } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate, useParams } from 'react-router-dom';
 import TeacheableMachine from '../Clases/TeacheableMachine';
+import DeteccionImagen from '../Clases/DeteccionImagen';
 import LoaderComponent from 'components/Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { URL_SERVICIO } from 'Clases/Constantes';
 
 const TeacheableMachineInstance = new TeacheableMachine();
+const DeteccionImagenInstance = new DeteccionImagen();
 
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
@@ -38,12 +40,49 @@ function ModificarAnimal() {
   const [animal, setAnimal] = useState(null); // Estado para almacenar los datos del animal
   const [predictions, setPredictions] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const imageRef = useRef(null);
   const [raza, setRaza] = useState([]); // Estado para la raza
   const [razaString, setRazaString] = useState(""); // Estado para la raza
   const [loadingAnimal, setLoadingAnimal] = useState(false); 
   const [loadingImage, setLoadingImage] = useState(false); 
   const [catalogoRazas, setCatalogoRazas] = useState([]); // Estado para la raza
+  const [validationMessage, setValidationMessage] = useState('');
+  const [modCargado, setModCargado] = useState(true);  
 
+    useEffect(() => {
+      const waitForModels = async () => {
+        await new Promise((resolve) => {
+          const checkModels = () => {
+            if (
+              TeacheableMachineInstance.getModel() &&
+              DeteccionImagenInstance.getModel()
+            ) {
+              resolve();
+            } else {
+              // Revisa periódicamente si ya se cargaron los modelos
+              const interval = setInterval(() => {
+                if (
+                  TeacheableMachineInstance.getModel() &&
+                  DeteccionImagenInstance.getModel()
+                ) {
+                  clearInterval(interval);
+                  resolve();
+                }
+              }, 300); // revisa cada 300ms
+            }
+          };
+    
+          checkModels();
+        });
+    
+        // Espera un pequeño tiempo adicional (opcional)
+        setTimeout(() => {
+          setModCargado(false);
+        }, 500);
+      };
+    
+      waitForModels();
+    }, []);
   // Cargar los datos del animal al montar el componente
   useEffect(() => {
     setLoadingAnimal(true);
@@ -142,21 +181,47 @@ function ModificarAnimal() {
     // Crear y devolver un objeto File
     return new File([u8arr], fileName, { type: mime });
 }
-  const handleFileChange = (event) => {
-    setLoadingImage(true); // Inicia la carga
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageFile(e.target.result);
-        validateImage(e.target.result);
+const handleFileChange = (event) => {
+  setLoadingImage(true);
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageData = e.target.result;
+      setImageFile(imageData);
+
+      // Crear imagen temporal solo para detectar carga completa
+      const tempImg = new Image();
+      tempImg.src = imageData;
+      tempImg.onload = () => {
+        validateImage(imageData);
       };
-      reader.readAsDataURL(file);
-    }
-  };
+    };
+    reader.readAsDataURL(file);
+  }
+};
     // Validar la imagen con el modelo de Teachable Machine
     const validateImage = async (imageSrc) => {
+      if(DeteccionImagenInstance.getModel() && imageRef.current){
+        await new Promise((resolve) => {
+          if (imageRef.current.complete) resolve();
+          else imageRef.current.onload = resolve;
+        });
+        const hayPerro = await DeteccionImagenInstance.handlePredict(imageRef.current);
+  
+        if (!hayPerro) {
+          setRaza([]);
+          setRazaString("");
+          formik.setFieldValue('raza', "");
+          setImageFile(null);           // Limpiar imagen
+          imageRef.current = null;      
+          setValidationMessage('No se detectó un perro en la imagen. Por favor, suba una imagen válida, o intente probar con una toma diferente.');
+          setLoadingImage(false);
+          return; // No continuar si no hay perro
+        }
+      }
       if (TeacheableMachineInstance.getModel() && imageSrc) {
+        setValidationMessage('');
         const imgElement = document.createElement("img");
         imgElement.src = imageSrc;
         imgElement.onload = async () => {
@@ -195,6 +260,14 @@ function ModificarAnimal() {
     };
   return (
     <Container className="mt-4">
+                  {modCargado && (
+              <div className="mt-3" style={{ textAlign: "center" }}>
+              <Spinner animation="border" role="status" className="spinn">
+                <span className="visually-hidden">Cargando elementos necesarios...</span>
+              </Spinner>
+              <p>Cargando elementos necesarios, espere...</p>
+            </div>
+                    )}
       <h4>Modificar Animal</h4>
       {!loadingAnimal ? (
       <Form onSubmit={formik.handleSubmit}>
@@ -207,6 +280,7 @@ function ModificarAnimal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.name && formik.errors.name}
+              disabled={modCargado}
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.name}
@@ -223,6 +297,7 @@ function ModificarAnimal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.description && formik.errors.description}
+              disabled={modCargado}
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.description}
@@ -240,6 +315,7 @@ function ModificarAnimal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.edad && formik.errors.edad}
+              disabled={modCargado}
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.edad}
@@ -254,6 +330,7 @@ function ModificarAnimal() {
               value={formik.values.raza}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              disabled={!imageFile || modCargado}
               isInvalid={formik.touched.raza && formik.errors.raza}
             />
             <Form.Control.Feedback type="invalid">
@@ -270,6 +347,7 @@ function ModificarAnimal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.ubicacion && formik.errors.ubicacion}
+              disabled={modCargado}
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.ubicacion}
@@ -283,6 +361,7 @@ function ModificarAnimal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.tamano && formik.errors.tamano}
+              disabled={modCargado}
             >
               <option value="0">Seleccione un tamaño</option>
               <option value="1">Pequeño</option>
@@ -305,6 +384,7 @@ function ModificarAnimal() {
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.contacto && formik.errors.contacto}
               inputMode="numeric"
+              disabled={modCargado}
             />
             <Form.Control.Feedback type="invalid">
               {formik.errors.contacto}
@@ -318,6 +398,7 @@ function ModificarAnimal() {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               isInvalid={formik.touched.estadoAdopcion && formik.errors.estadoAdopcion}
+              disabled={modCargado}
             >
               <option value="0">Seleccione el estado</option>
               <option value="1">En adopción</option>
@@ -336,12 +417,13 @@ function ModificarAnimal() {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
+              disabled={modCargado}
             />
           <Form.Control.Feedback type="invalid">
             {formik.errors.image}
           </Form.Control.Feedback>
           </Form.Group>
-          {imageFile && <img src={imageFile} alt="Uploaded" style={{ marginTop: '20px', maxWidth: '300px' }} />}
+          {imageFile && <img src={imageFile} ref={imageRef} alt="Uploaded" style={{ marginTop: '20px', maxWidth: '300px' }} />}
         {/* {predictions.length > 0 && (
           <div id="label-container" style={{ marginTop: '20px' }}>
             {predictions.map((prediction, index) => (
@@ -354,7 +436,10 @@ function ModificarAnimal() {
         {loadingImage && (
   <LoaderComponent/>
         )}
-        <Button variant="primary" type="submit" className="mt-3" disabled={loadingAnimal || loadingImage || !formik.dirty || formik.isSubmitting}>
+                {validationMessage && (
+  <p style={{ color: 'red', marginTop: '10px' }}>{validationMessage}</p>
+)}
+        <Button variant="primary" type="submit" className="mt-3" disabled={loadingAnimal || loadingImage || !formik.dirty || formik.isSubmitting  || modCargado}>
           Modificar
         </Button>
         </Form>
