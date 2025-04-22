@@ -16,6 +16,7 @@ import RegistroUsuario from 'pages/RegistroUsuario';
 import ModificarAnimal from 'pages/ModificarAnimal';
 import PrivacyPolicy from 'pages/PrivacyPolicy';
 import CambioContrasena from 'pages/CambioContrasena';
+import DogDetector from 'pages/DogDetector';
 function App() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [searchImg, setSearchImg] = React.useState(null);
@@ -37,6 +38,7 @@ function App() {
             <Route path="/" element={<Home searchTerm={searchTerm} searchImg={searchImg} />} />
             <Route path="/animal/:id" element={<AnimalDetail />} />
             <Route path="/publicar" element={<PublishAnimal />} />
+            <Route path="/dog" element={<DogDetector />} />
             <Route path="/modificarAnimal/:id" element={<ModificarAnimal />} />
             <Route path="/publicaciones/:id" element={<MisPublicaciones />} />
             <Route path="/usuarios" element={<UsuariosCRUD />} />

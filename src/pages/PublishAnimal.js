@@ -43,8 +43,6 @@ function PublishAnimal() {
   const [loading, setLoading] = useState(false); 
   const [catalogoRazas, setCatalogoRazas] = useState([]); // Estado para la raza
 
-  const URL = "https://teachablemachine.withgoogle.com/models/lS3pHIPWc/";
-
   // Cargar el modelo al montar el componente
   // useEffect(() => {
   //   const loadModel = async () => {
