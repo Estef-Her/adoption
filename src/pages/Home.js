@@ -33,7 +33,10 @@ function Home({ searchTerm, searchImg}) {
     setModalIsOpen(false);
   };
   useEffect(() => {
-    axios.get(URL_SERVICIO + 'animals')
+    console.log(URL_SERVICIO);
+    axios.get(URL_SERVICIO + 'animals',{headers: {
+    'ngrok-skip-browser-warning': 'true'
+  }})
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);
