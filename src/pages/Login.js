@@ -8,6 +8,7 @@ import logo from '../images/logo.png';
 import { GOOGLE_CLIENT_ID,FACEBOOK_CLIENT_ID } from 'Clases/Constantes';
 import { GoogleLogin } from 'react-google-login';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
@@ -110,6 +111,7 @@ const [loader, setLoader]=React.useState(false);
           <img src={logo} alt="Logo" className="app-logo" />
         </div>
         {error && <Alert variant="danger">{error}</Alert>}
+         <LoadingModal visible={loader} />
         <Form onSubmit={formik.handleSubmit}>
           <Form.Group controlId="email">
             <Form.Label>Correo Electrónico</Form.Label>

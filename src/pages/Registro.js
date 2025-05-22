@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
@@ -16,7 +17,9 @@ const validationSchema = yup.object().shape({
 
 function Registro() {
   const [error, setError] = useState('');
+  const [mensajeExito, setMensajeExito] = useState('');
   const navigate = useNavigate();
+const [loader, setLoader]=React.useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -29,14 +32,20 @@ function Registro() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
+        setLoader(true);
         const response = await api.post(URL_SERVICIO + 'registroUsuario', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
         if (response.status === 201) {
-          navigate('/login'); // Redirigir al usuario al login después de registrar
+          setLoader(false);
+         setMensajeExito('Cuenta creada exitosamente. Redirigiendo al login...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
         }
       } catch (error) {
+        setLoader(false);
         setError('Error al crear la cuenta. Por favor, intenta de nuevo.');
       }
     },
@@ -47,6 +56,8 @@ function Registro() {
            <div className="login-box">
            <h2 className="text-center login-title">Crear cuenta</h2>
       {error && <Alert variant="danger">{error}</Alert>}
+      {mensajeExito && <div style={{ color: 'green' }}>{mensajeExito}</div>}
+       <LoadingModal visible={loader} />
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group controlId="nombre">
           <Form.Label>Nombre</Form.Label>
