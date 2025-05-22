@@ -19,6 +19,7 @@ function Login({ setIsAuthenticated }) {
   const [error, setError] = React.useState('');
   const navigate = useNavigate();
 const [user, setUser]=React.useState(null);
+const [loader, setLoader]=React.useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -28,6 +29,7 @@ const [user, setUser]=React.useState(null);
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
+        setLoader(true);
         const response = await api.post(URL_SERVICIO + 'login', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
@@ -39,10 +41,12 @@ const [user, setUser]=React.useState(null);
         setIsAuthenticated(true);
         // Si el login es exitoso, redirige o guarda el token
         console.log(response.data); // Aquí podrías guardar un token o manejar la respuesta como necesites
+        setLoader(false);
         navigate('/'); // Redirigir al usuario al dashboard o a la página deseada
       } catch (error) {
         setIsAuthenticated(false);
         setError('Credenciales inválidas. Por favor, intenta de nuevo.');
+        setLoader(false);
       }
     },
   });
