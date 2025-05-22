@@ -58,7 +58,10 @@ function UsuariosCRUD() {
           if(!values.id){
             values.id = selectedUser.id;
           }
-          const response = await axios.put(URL_SERVICIO + 'modificarUsuario', values);
+          const response = await axios.put(URL_SERVICIO + 'modificarUsuario', values,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }});
           if (response.status === 201) {
             toast.success('El usuario ha sido modificado exitosamente!');
             setLoading(false);
@@ -66,7 +69,10 @@ function UsuariosCRUD() {
             ListarUsuarios();
           }
         }else{
-          const response = await axios.post(URL_SERVICIO + 'registroUsuarioAd', values);
+          const response = await axios.post(URL_SERVICIO + 'registroUsuarioAd', values,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }});
           if (response.status === 201) {
             toast.success('El usuario ha sido registrado exitosamente!');
             setLoading(false);
@@ -82,7 +88,10 @@ function UsuariosCRUD() {
     },
   });
   const ListarUsuarios = ()=>{
-    axios.get(URL_SERVICIO + 'usuarios') // Cambia esta URL a tu endpoint
+    axios.get(URL_SERVICIO + 'usuarios',{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }}) // Cambia esta URL a tu endpoint
       .then(response => {
         setUsers(response.data);
         setUsersC(response.data)
@@ -109,7 +118,10 @@ function UsuariosCRUD() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:4000/usuario/${userId}`)
+        axios.delete(`http://localhost:4000/usuario/${userId}`,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }})
           .then(() => {
             ListarUsuarios();
             toast.success('El usuario ha sido eliminado exitosamente!'); // Mostrar mensaje emergente

@@ -98,7 +98,10 @@ function PublishAnimal() {
   }, []);
   
   useEffect(() => {
-    axios.get(URL_SERVICIO + 'razas')
+    axios.get(URL_SERVICIO + 'razas',{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }})
       .then(response => {
         setCatalogoRazas(response.data);
       })
@@ -143,9 +146,10 @@ function PublishAnimal() {
       //   formData.append('image', values.image);
       // }
       // Obtener el token de autenticación
+      
       axios.post(URL_SERVICIO + 'animals', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data','ngrok-skip-browser-warning': 'true'
         },
       })
       .then(response => {

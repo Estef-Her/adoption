@@ -14,7 +14,7 @@ function Logout({ setIsAuthenticated }) {
       await axios.post(
         URL_SERVICIO + 'logout', 
         {}, // No necesitas enviar datos en el cuerpo
-        { headers: { Authorization: `Bearer ${token}` } } // Enviar el token en los headers
+        { headers: { 'ngrok-skip-browser-warning': 'true',Authorization: `Bearer ${token}` } } // Enviar el token en los headers
       );
 
       // Limpiar almacenamiento local después del logout exitoso

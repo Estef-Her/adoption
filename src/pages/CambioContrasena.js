@@ -36,7 +36,11 @@ function CambioContrasena() {
           actualContrasena: values.actualContrasena,
           nuevaContrasena: values.nuevaContrasena,
           email:user.email
-        });
+        },{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  });
         setError('');
         setMessage(response.data.error==false ? response.data.message || 'Contraseña establecida con éxito.':'');
         setError(response.data.error==true ? response.data.message:'');

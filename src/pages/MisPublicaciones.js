@@ -14,7 +14,10 @@ function MisPublicaciones() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     var ide=id!=null && id != "0"? id : user.id;
-    axios.get(URL_SERVICIO+`animalsPorUsuario/${ide}`)
+    axios.get(URL_SERVICIO+`animalsPorUsuario/${ide}`,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }})
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);
@@ -33,7 +36,10 @@ function MisPublicaciones() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(URL_SERVICIO+`animals/${animalId}`)
+        axios.delete(URL_SERVICIO+`animals/${animalId}`,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }})
           .then(() => {
             setAnimals(animals.filter(animal => animal.id !== animalId));
             setFilteredAnimals(filteredAnimals.filter(animal => animal.id !== animalId));

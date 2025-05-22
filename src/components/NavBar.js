@@ -68,7 +68,11 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
     }, []);
 
   useEffect(() => {
-    axios.get(URL_SERVICIO + 'razas')
+    axios.get(URL_SERVICIO + 'razas',  {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  })
       .then(response => {
         setCatalogoRazas(response.data);
       })

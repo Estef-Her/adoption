@@ -36,7 +36,10 @@ function RecuperarContrasena() {
         setIsLoading(true);
         console.log("Entro a submit");
         // Realizar una solicitud POST al backend para la recuperación de contraseña
-        const response = await axios.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email });
+        const response = await axios.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email },{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }});
         setMessage(response.data.error==false ? response.data.message || 'Se ha enviado un enlace de recuperación a tu correo electrónico.':'');
         setEmail(values.email);
         setError(response.data.error==true ? response.data.message:'');
@@ -61,7 +64,10 @@ function RecuperarContrasena() {
           codigo: values.codigo,
           nuevaContrasena: values.nuevaContrasena,
           email:email
-        });
+        },{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }});
         setError('');
         setMessage(response.data.error==false ? response.data.message || 'Contraseña establecida con éxito.':'');
         setError(response.data.error==true ? response.data.message:'');

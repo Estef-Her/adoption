@@ -28,7 +28,11 @@ const [user, setUser]=React.useState(null);
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(URL_SERVICIO + 'login', values);
+        const response = await axios.post(URL_SERVICIO + 'login', values,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  });
         const { token, user } = response.data; // Supongamos que el backend devuelve un token y los detalles del usuario
         localStorage.setItem('tokenn', token);
         localStorage.setItem('user', JSON.stringify(user));
@@ -49,7 +53,11 @@ const [user, setUser]=React.useState(null);
 
     // Enviar el token de Google al backend para su validación
     try {
-      const res = await axios.post(URL_SERVICIO + 'auth/google', { token: tokenId });
+      const res = await axios.post(URL_SERVICIO + 'auth/google', { token: tokenId },{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  });
       const { token, user } = res.data;
       localStorage.setItem('tokenn', token);
       localStorage.setItem('user', JSON.stringify(user));

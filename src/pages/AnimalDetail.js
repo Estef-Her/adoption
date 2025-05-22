@@ -11,7 +11,11 @@ function AnimalDetail() {
   const navigate = useNavigate(); // Inicializa useNavigate
 
   useEffect(() => {
-    axios.get(URL_SERVICIO +`animals/${id}`)
+    axios.get(URL_SERVICIO +`animals/${id}`,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  })
       .then(response => setAnimal(response.data))
       .catch(error => console.error(error));
   }, [id]);

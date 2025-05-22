@@ -86,7 +86,10 @@ function ModificarAnimal() {
   // Cargar los datos del animal al montar el componente
   useEffect(() => {
     setLoadingAnimal(true);
-    axios.get(`http://localhost:4000/animals/${id}`)
+    axios.get(`http://localhost:4000/animals/${id}`,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }})
       .then(response => {
         setAnimal(response.data);
         setImageFile(response.data.foto);
@@ -101,7 +104,10 @@ function ModificarAnimal() {
   }, [id]);
   useEffect(() => {
     setLoadingAnimal(true);
-    axios.get(URL_SERVICIO + 'razas')
+    axios.get(URL_SERVICIO + 'razas',{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }})
       .then(response => {
         setCatalogoRazas(response.data);
         var s = animal ? animal.foto : '';
@@ -147,10 +153,11 @@ function ModificarAnimal() {
         console.log(file);
         formData.append('imageFile', file);
       }
+      
       // Enviar los datos modificados
       axios.put(URL_SERVICIO + 'animals', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'multipart/form-data','ngrok-skip-browser-warning': 'true'
         },
       })
       .then(response => {

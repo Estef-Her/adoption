@@ -29,7 +29,10 @@ function RegistroUsuario() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(URL_SERVICIO + 'registroUsuario', values);
+        const response = await axios.post(URL_SERVICIO + 'registroUsuario', values,{
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }});
         if (response.status === 201) {
           navigate('/usuarios'); // Redirigir al usuario al listado de usuarios después de registrar
         }
