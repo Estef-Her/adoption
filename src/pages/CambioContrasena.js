@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -32,7 +32,7 @@ function CambioContrasena() {
       try {
         setIsLoading(true);
         // Realizar la solicitud para cambiar la contraseña
-        const response = await axios.post(URL_SERVICIO + 'cambiar-contrasena', {
+        const response = await api.post(URL_SERVICIO + 'cambiar-contrasena', {
           actualContrasena: values.actualContrasena,
           nuevaContrasena: values.nuevaContrasena,
           email:user.email

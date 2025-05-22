@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -29,7 +29,7 @@ function RegistroUsuario() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(URL_SERVICIO + 'registroUsuario', values,{
+        const response = await api.post(URL_SERVICIO + 'registroUsuario', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Link } from 'react-router-dom';
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import Swal from 'sweetalert2'; // Para las alertas emergentes
@@ -14,7 +14,7 @@ function MisPublicaciones() {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     var ide=id!=null && id != "0"? id : user.id;
-    axios.get(URL_SERVICIO+`animalsPorUsuario/${ide}`,{
+    api.get(URL_SERVICIO+`animalsPorUsuario/${ide}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
@@ -36,7 +36,7 @@ function MisPublicaciones() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(URL_SERVICIO+`animals/${animalId}`,{
+        api.delete(URL_SERVICIO+`animals/${animalId}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})

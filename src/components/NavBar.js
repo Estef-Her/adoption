@@ -8,7 +8,7 @@ import TeacheableMachine from '../Clases/TeacheableMachine';
 import DeteccionImagen from '../Clases/DeteccionImagen';
 import LoaderComponent from 'components/Loader';
 import { faUser, faSignOutAlt, faUserCircle,faTimes,faTruckLoading } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { URL_SERVICIO } from 'Clases/Constantes';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
@@ -68,7 +68,7 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
     }, []);
 
   useEffect(() => {
-    axios.get(URL_SERVICIO + 'razas',  {
+    api.get(URL_SERVICIO + 'razas',  {
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }

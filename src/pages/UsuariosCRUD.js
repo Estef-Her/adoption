@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import DataTable,{createTheme} from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { Card, Button, Container, Row, Col ,Form , Modal,Alert} from 'react-bootstrap';
@@ -58,7 +58,7 @@ function UsuariosCRUD() {
           if(!values.id){
             values.id = selectedUser.id;
           }
-          const response = await axios.put(URL_SERVICIO + 'modificarUsuario', values,{
+          const response = await api.put(URL_SERVICIO + 'modificarUsuario', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
@@ -69,7 +69,7 @@ function UsuariosCRUD() {
             ListarUsuarios();
           }
         }else{
-          const response = await axios.post(URL_SERVICIO + 'registroUsuarioAd', values,{
+          const response = await api.post(URL_SERVICIO + 'registroUsuarioAd', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
@@ -88,7 +88,7 @@ function UsuariosCRUD() {
     },
   });
   const ListarUsuarios = ()=>{
-    axios.get(URL_SERVICIO + 'usuarios',{
+    api.get(URL_SERVICIO + 'usuarios',{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }}) // Cambia esta URL a tu endpoint
@@ -118,7 +118,7 @@ function UsuariosCRUD() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:4000/usuario/${userId}`,{
+        api.delete(URL_SERVICIO+`usuario/${userId}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})

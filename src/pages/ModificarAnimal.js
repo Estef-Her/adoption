@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Form, Button, Spinner } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -10,6 +10,7 @@ import LoaderComponent from 'components/Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 const TeacheableMachineInstance = new TeacheableMachine();
 const DeteccionImagenInstance = new DeteccionImagen();
@@ -86,7 +87,7 @@ function ModificarAnimal() {
   // Cargar los datos del animal al montar el componente
   useEffect(() => {
     setLoadingAnimal(true);
-    axios.get(`http://localhost:4000/animals/${id}`,{
+    api.get(URL_SERVICIO+`animals/${id}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
@@ -104,7 +105,7 @@ function ModificarAnimal() {
   }, [id]);
   useEffect(() => {
     setLoadingAnimal(true);
-    axios.get(URL_SERVICIO + 'razas',{
+    api.get(URL_SERVICIO + 'razas',{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
@@ -155,7 +156,7 @@ function ModificarAnimal() {
       }
       
       // Enviar los datos modificados
-      axios.put(URL_SERVICIO + 'animals', formData, {
+      api.put(URL_SERVICIO + 'animals', formData, {
         headers: {
           'Content-Type': 'multipart/form-data','ngrok-skip-browser-warning': 'true'
         },
@@ -267,14 +268,7 @@ const handleFileChange = (event) => {
     };
   return (
     <Container className="mt-4">
-                  {modCargado && (
-              <div className="mt-3" style={{ textAlign: "center" }}>
-              <Spinner animation="border" role="status" className="spinn">
-                <span className="visually-hidden">Cargando elementos necesarios...</span>
-              </Spinner>
-              <p>Cargando elementos necesarios, espere...</p>
-            </div>
-                    )}
+                 <LoadingModal visible={modCargado} />
       <h4>Modificar Animal</h4>
       {!loadingAnimal ? (
       <Form onSubmit={formik.handleSubmit}>

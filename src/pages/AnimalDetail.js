@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams,useNavigate  } from 'react-router-dom';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Card,Button  } from 'react-bootstrap';
 import { URL_SERVICIO } from 'Clases/Constantes';
 
@@ -11,7 +11,7 @@ function AnimalDetail() {
   const navigate = useNavigate(); // Inicializa useNavigate
 
   useEffect(() => {
-    axios.get(URL_SERVICIO +`animals/${id}`,{
+    api.get(URL_SERVICIO +`animals/${id}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }

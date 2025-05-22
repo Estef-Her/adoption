@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect } from 'react';
 import { URL_SERVICIO } from 'Clases/Constantes';
@@ -11,7 +11,7 @@ function Logout({ setIsAuthenticated }) {
       const token = localStorage.getItem('tokenn'); // Asegúrate de que coincida con el nombre correcto
 
       // Enviar el token como parte de los encabezados en la solicitud
-      await axios.post(
+      await api.post(
         URL_SERVICIO + 'logout', 
         {}, // No necesitas enviar datos en el cuerpo
         { headers: { 'ngrok-skip-browser-warning': 'true',Authorization: `Bearer ${token}` } } // Enviar el token en los headers

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -36,7 +36,7 @@ function RecuperarContrasena() {
         setIsLoading(true);
         console.log("Entro a submit");
         // Realizar una solicitud POST al backend para la recuperación de contraseña
-        const response = await axios.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email },{
+        const response = await api.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email },{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
@@ -60,7 +60,7 @@ function RecuperarContrasena() {
       try {
         setIsLoading(true);
         // Realizar la solicitud para restablecer la contraseña
-        const response = await axios.post(URL_SERVICIO + 'restablecer-contrasena', {
+        const response = await api.post(URL_SERVICIO + 'restablecer-contrasena', {
           codigo: values.codigo,
           nuevaContrasena: values.nuevaContrasena,
           email:email

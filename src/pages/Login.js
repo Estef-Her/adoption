@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -28,7 +28,7 @@ const [user, setUser]=React.useState(null);
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(URL_SERVICIO + 'login', values,{
+        const response = await api.post(URL_SERVICIO + 'login', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }
@@ -53,7 +53,7 @@ const [user, setUser]=React.useState(null);
 
     // Enviar el token de Google al backend para su validación
     try {
-      const res = await axios.post(URL_SERVICIO + 'auth/google', { token: tokenId },{
+      const res = await api.post(URL_SERVICIO + 'auth/google', { token: tokenId },{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }

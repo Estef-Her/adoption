@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Link } from 'react-router-dom';
 import { Card, Button, Container, Row, Col ,Form } from 'react-bootstrap';
 import Perro from 'Clases/entidades/perro';
@@ -34,7 +34,7 @@ function Home({ searchTerm, searchImg}) {
   };
   useEffect(() => {
     console.log(URL_SERVICIO);
-    axios.get(URL_SERVICIO + 'animals',{headers: {
+    api.get(URL_SERVICIO + 'animals',{headers: {
     'ngrok-skip-browser-warning': 'true'
   }})
       .then(response => {

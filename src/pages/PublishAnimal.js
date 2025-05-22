@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import axios from 'axios';
+import api from '../axiosConfig';
 import { Container, Form, Button,Spinner } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -12,6 +12,7 @@ import LoaderComponent from 'components/Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 const TeacheableMachineInstance = new TeacheableMachine();
 const DeteccionImagenInstance = new DeteccionImagen();
@@ -98,7 +99,7 @@ function PublishAnimal() {
   }, []);
   
   useEffect(() => {
-    axios.get(URL_SERVICIO + 'razas',{
+    api.get(URL_SERVICIO + 'razas',{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
@@ -147,7 +148,7 @@ function PublishAnimal() {
       // }
       // Obtener el token de autenticación
       
-      axios.post(URL_SERVICIO + 'animals', formData, {
+      api.post(URL_SERVICIO + 'animals', formData, {
         headers: {
           'Content-Type': 'multipart/form-data','ngrok-skip-browser-warning': 'true'
         },
@@ -273,14 +274,15 @@ function PublishAnimal() {
 
   return (
     <Container className="mt-4">
-            {modCargado && (
+            {/* {modCargado && (
         <div className="mt-3" style={{ textAlign: "center" }}>
         <Spinner animation="border" role="status" className="spinn">
           <span className="visually-hidden">Cargando elementos necesarios...</span>
         </Spinner>
         <p>Cargando elementos necesarios, espere...</p>
       </div>
-              )}
+              )} */}
+              <LoadingModal visible={modCargado} />
       <h4>Publicar</h4>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group controlId="name">
