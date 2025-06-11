@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    // Intenta recargar la misma URL para que React Router tome la ruta
+    window.onload = function() {
+      if (!window.location.href.includes('adoption')) {
+        window.location.href = '/adoption' + window.location.pathname;
+      }
+    }
+  </script>
+</head>
+<body>
+  <p>Redirigiendo...</p>
+</body>
+</html>
