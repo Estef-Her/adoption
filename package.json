@@ -27,6 +27,7 @@
     "react-data-table-component": "^7.6.2",
     "react-dom": "^18.3.1",
     "react-google-login": "^5.2.2",
+    "react-icons": "^5.5.0",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1",
@@ -63,8 +64,8 @@
     ]
   },
   "react-scripts": {
-  "GENERATE_SOURCEMAP": false
-},
+    "GENERATE_SOURCEMAP": false
+  },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "gh-pages": "^6.3.0"
