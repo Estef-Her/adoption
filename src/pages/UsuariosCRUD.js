@@ -152,8 +152,7 @@ function UsuariosCRUD() {
     }).then((result) => {
       if (result.isConfirmed) {
         setModCargado(true);
-        axios
-          .delete(URL_SERVICIO + `usuario/${userId}`, {
+        axios.delete(`${URL_SERVICIO}usuario/${userId}`, {
             headers: {
               "ngrok-skip-browser-warning": "true",
             },

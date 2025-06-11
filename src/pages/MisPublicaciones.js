@@ -44,7 +44,7 @@ function MisPublicaciones() {
     }).then((result) => {
       if (result.isConfirmed) {
         setModCargado(true);
-        axios.delete(URL_SERVICIO+`animals/${animalId}`,{
+        axios.delete(`${URL_SERVICIO}animals/${animalId}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
