@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter  as Router, Route, Routes } from 'react-router-dom';
 
 import Home from './pages/Home';
 import AnimalDetail from './pages/AnimalDetail';
@@ -34,7 +34,7 @@ function AppContent() {
 
   return (
     <>
-      <Router basename="/adoption">
+      <Router >
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <NavBar isAuthenticated={isAuthenticated} onSearch={handleSearch} onSearchImg={handleSearchImg} />
           <div style={{ flex: 1 }}>
