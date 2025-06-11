@@ -52,6 +52,7 @@ function Registro() {
           },
           }
         );
+        console.log(response);
         if (response.status === 201) {
           setLoader(false);
           setMensajeExito(
