@@ -131,4 +131,4 @@ const enviarCorreoModificacion = async (email, contrasena,user,recoveryLinkP) =>
     throw new Error('Error al enviar el correo');
   }
 };
-module.exports = { sendPasswordRecoveryEmail,enviarCorreoRegistro,enviarCorreoModificacion };
+module.exports = { sendPasswordRecoveryEmail,enviarCorreoRegistro,enviarCorreoRegistroPropio,enviarCorreoModificacion };
