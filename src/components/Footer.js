@@ -6,9 +6,9 @@ function Footer() {
   return (
     <footer className="custom-navbar">
       <Container>
-        <Row>
+        <Row style={{margin:10}}>
           <Col className="text-center">
-            <p>&copy; 2024 Adoptar Salva Vidas. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Adoptar Salva Vidas. Todos los derechos reservados.</p>
           </Col>
         </Row>
       </Container>

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import api from '../axiosConfig';
+import axios from 'axios';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 // Esquema de validación de Yup
 const validationSchema = yup.object().shape({
@@ -17,6 +18,7 @@ const validationSchema = yup.object().shape({
 function RegistroUsuario() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [modCargado, setModCargado] = useState(false);  
 
   const formik = useFormik({
     initialValues: {
@@ -29,21 +31,25 @@ function RegistroUsuario() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await api.post(URL_SERVICIO + 'registroUsuario', values,{
+        setModCargado(true);
+        const response = await axios.post(URL_SERVICIO + 'registroUsuario', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
         if (response.status === 201) {
+          setModCargado(false);
           navigate('/usuarios'); // Redirigir al usuario al listado de usuarios después de registrar
         }
       } catch (error) {
         setError('Error al crear la cuenta. Por favor, intenta de nuevo.');
+        setModCargado(false);
       }
     },
   });
 
   return (
 <Container className="mt-4">
+  <LoadingModal visible={modCargado} />
       <h4>Crear usuario</h4>
       {error && <Alert variant="danger">{error}</Alert>}
       <Form onSubmit={formik.handleSubmit}>

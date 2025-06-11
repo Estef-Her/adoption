@@ -7,7 +7,7 @@ const api = axios.create({
 });
 
 // Interceptor antes de enviar solicitud
-api.interceptors.request.use(
+axios.interceptors.request.use(
   (config) => {
     loadingController.show(); // Mostrar "Cargando..."
     return config;
@@ -19,7 +19,7 @@ api.interceptors.request.use(
 );
 
 // Interceptor cuando se recibe respuesta
-api.interceptors.response.use(
+axios.interceptors.response.use(
   (response) => {
     loadingController.hide(); // Ocultar "Cargando..."
     return response;

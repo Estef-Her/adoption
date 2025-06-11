@@ -8,10 +8,11 @@ import TeacheableMachine from '../Clases/TeacheableMachine';
 import DeteccionImagen from '../Clases/DeteccionImagen';
 import LoaderComponent from 'components/Loader';
 import { faUser, faSignOutAlt, faUserCircle,faTimes,faTruckLoading } from '@fortawesome/free-solid-svg-icons';
-import api from '../axiosConfig';
+import axios from 'axios';
 import { URL_SERVICIO } from 'Clases/Constantes';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
+import LoadingModal from '../LoadingModal'
 
 
 const TeacheableMachineInstance = new TeacheableMachine();
@@ -29,10 +30,12 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
   const [catalogoRazas, setCatalogoRazas] = useState([]); // Estado para la raza
-  const [modCargado, setModCargado] = useState(true);  
+  const [modelCargando, setModelCargando] = useState(false);  
+  const [mCargado, setMcargado] = useState(false);  
   const [validationMessage, setValidationMessage] = useState('');
 
     useEffect(() => {
+      setModelCargando(true);
       const waitForModels = async () => {
         await new Promise((resolve) => {
           const checkModels = () => {
@@ -41,6 +44,8 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
               DeteccionImagenInstance.getModel()
             ) {
               resolve();
+              setModelCargando(false);
+              setMcargado(true);
             } else {
               // Revisa periódicamente si ya se cargaron los modelos
               const interval = setInterval(() => {
@@ -50,6 +55,8 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
                 ) {
                   clearInterval(interval);
                   resolve();
+                  setModelCargando(false);
+                  setMcargado(true);
                 }
               }, 300); // revisa cada 300ms
             }
@@ -57,26 +64,27 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
     
           checkModels();
         });
-    
-        // Espera un pequeño tiempo adicional (opcional)
-        setTimeout(() => {
-          setModCargado(false);
-        }, 500);
       };
     
       waitForModels();
     }, []);
 
   useEffect(() => {
-    api.get(URL_SERVICIO + 'razas',  {
+    setModelCargando(true);
+    axios.get(URL_SERVICIO + 'razas',  {
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }
   })
       .then(response => {
         setCatalogoRazas(response.data);
+        if(mCargado){
+          setModelCargando(false);
+        }
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+      });
   }, []);
   const handleSearch = (event) => {
     event.preventDefault();
@@ -106,7 +114,10 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
     onSearchImg(null);
     setImageFile(null);
   };
-  const handleModalShow = () => setShowModal(true);
+  const handleModalShow = () => {
+    setValidationMessage("");
+    setShowModal(true);
+  }
 
   const handleFileChange = (event) => {
     setLoading(true);
@@ -203,6 +214,7 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
     <>
     <Navbar className="custom-navbar" expand="lg">
       <Container>
+         <LoadingModal visible={modelCargando} />
       <Navbar.Brand as={Link} to="/">
           <img
             src={logo}
@@ -235,13 +247,13 @@ function NavBar({ onSearch , isAuthenticated, onSearchImg}) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <span title={modCargado ? "Se están cargando los elementos necesarios" : ""}>
+            <span title={modelCargando ? "Se están cargando los elementos necesarios" : ""}>
             <Button
       variant={raza.length > 0 ? "danger" : "light"}
       className="me-2 position-relative"
-      disabled={modCargado}
+      disabled={modelCargando}
       onClick={raza.length > 0 ? handleClearFilter : handleModalShow}
-      style={modCargado ? { pointerEvents: 'none' } : {}}
+      style={modelCargando ? { pointerEvents: 'none' } : {}}
     >
       <FontAwesomeIcon icon={faImage} style={{ color: 'white' }} />
       {raza.length > 0 && (

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import api from '../axiosConfig';
+import axios from 'axios';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import LoaderComponent from 'components/Loader';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 const validationSchema = yup.object().shape({
   nuevaContrasena: yup
@@ -24,6 +25,7 @@ function CambioContrasena() {
   const [error, setError] = useState('');
   const user = JSON.parse(localStorage.getItem('user'));
   const navigate = useNavigate();  // Reemplazamos useHistory por useNavigate
+    const [modCargado, setModCargado] = useState(false);  
 
   const formikRestablecer = useFormik({
     initialValues: { nuevaContrasena: '',actualContrasena: '',email: user.email, },
@@ -31,8 +33,9 @@ function CambioContrasena() {
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
+        setModCargado(true);
         // Realizar la solicitud para cambiar la contraseña
-        const response = await api.post(URL_SERVICIO + 'cambiar-contrasena', {
+        const response = await axios.post(URL_SERVICIO + 'cambiar-contrasena', {
           actualContrasena: values.actualContrasena,
           nuevaContrasena: values.nuevaContrasena,
           email:user.email
@@ -47,16 +50,21 @@ function CambioContrasena() {
         // Redirigir al login
         if(response.data.error != true)setTimeout(() => navigate('/cuenta'), 3000); // Usamos navigate en lugar de useHistory
         setIsLoading(false);
+        setTimeout(() => {
+            setModCargado(false);
+          }, 500);
       } catch (error) {
         setMessage('');
         setError('Error al restablecer la contraseña. Por favor, intenta de nuevo.');
         setIsLoading(false);
+        setModCargado(false);
       }
     },
   });
 
   return (
     isLoading ? <LoaderComponent/> : <Container className="password-recovery-container">
+      <LoadingModal visible={modCargado} />
       <h3>Cambio de contraseña</h3>
 
       {/* Mensajes de éxito o error */}

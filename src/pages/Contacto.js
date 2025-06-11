@@ -2,6 +2,7 @@
 import React from 'react';
 import Modal from 'react-modal';
 import { NOMBRE_SITIO} from '../Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 const Contacto = ({ animalC, modalIsOpen, closeModal }) => {
   console.log(animalC);

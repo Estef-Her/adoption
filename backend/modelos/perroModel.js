@@ -1,18 +1,18 @@
 // PerroModel.js
-const db = require('../db'); // Importa la conexión a la base de datos
-const Perro = require('../entidades/perro'); // Importa la clase Perro
-const razaPerroModel = require('./razaPerroModel'); // Importa el modelo de razaPerro
+const db = require("../db"); // Importa la conexión a la base de datos
+const Perro = require("../entidades/perro"); // Importa la clase Perro
+const razaPerroModel = require("./razaPerroModel"); // Importa el modelo de razaPerro
 
 // Obtener todas las Perros
 const getAllPerros = (callback) => {
-  if (typeof callback !== 'function') {
-    throw new Error('El callback proporcionado no es una función');
+  if (typeof callback !== "function") {
+    throw new Error("El callback proporcionado no es una función");
   }
 
   // Consulta SQL con JOIN para incluir las razas y probabilidades
   const sql = `
     SELECT 
-      p.id, p.ubicacion, p.tamano, p.contacto, p.edad, p.descripcion, 
+      p.id, p.direccion,p.provincia,p.canton,p.distrito, p.tamano, p.contacto, p.edad, p.descripcion, 
       p.nombre, p.foto, p.estadoAdopcion, p.userId, 
       r.nombre AS razaNombre, pr.probabilidad, u.nombre as nombreUsuario 
     FROM perro p
@@ -29,14 +29,17 @@ const getAllPerros = (callback) => {
     // Mapear los resultados para agrupar las razas por perro
     const perrosMap = new Map();
 
-    results.forEach(row => {
+    results.forEach((row) => {
       const perroId = row.id;
 
       // Si el perro aún no existe en el mapa, lo creamos
       if (!perrosMap.has(perroId)) {
         perrosMap.set(perroId, {
           id: perroId,
-          ubicacion: row.ubicacion,
+          direccion: row.direccion,
+          provincia: row.provincia,
+          canton: row.canton,
+          distrito: row.distrito,
           tamano: row.tamano,
           contacto: row.contacto,
           edad: row.edad,
@@ -46,14 +49,14 @@ const getAllPerros = (callback) => {
           estadoAdopcion: row.estadoAdopcion,
           userId: row.userId,
           razas: [],
-          nombreUsuario:row.nombreUsuario
+          nombreUsuario: row.nombreUsuario,
         });
       }
       // Si hay una raza asociada, la añadimos al array de razas
       if (row.razaNombre) {
         perrosMap.get(perroId).razas.push({
           nombre: row.razaNombre,
-          probabilidad: row.probabilidad
+          probabilidad: row.probabilidad,
         });
       }
     });
@@ -66,17 +69,16 @@ const getAllPerros = (callback) => {
   });
 };
 
-
 // Obtener una Perro por ID
 const getPerroById = (id, callback) => {
-  if (typeof callback !== 'function') {
-    throw new Error('El callback proporcionado no es una función');
+  if (typeof callback !== "function") {
+    throw new Error("El callback proporcionado no es una función");
   }
   const sql = `
   SELECT 
-    p.id, p.ubicacion, p.tamano, p.contacto, p.edad, p.descripcion, 
+    p.id, p.direccion,p.provincia,p.canton,p.distrito, p.tamano, p.contacto, p.edad, p.descripcion, 
     p.nombre, p.foto, p.estadoAdopcion, p.userId, 
-    r.nombre AS razaNombre, pr.probabilidad, u.nombre as nombreUsuario 
+    r.nombre AS razaNombre, pr.probabilidad, r.id as razaId, u.nombre as nombreUsuario 
   FROM perro p
   LEFT JOIN perro_razas pr ON p.id = pr.perro_id
   LEFT JOIN raza r ON pr.raza_id = r.id
@@ -89,30 +91,33 @@ const getPerroById = (id, callback) => {
     if (result.length === 0) {
       return callback(null, null); // Perro no encontrada
     }
-    
+
     const row1 = result[0];
     var perro = new Perro(
-      row1.id, 
-      row1.ubicacion, 
-      row1.tamano, 
-      row1.contacto, 
-      row1.edad, 
-      row1.descripcion, 
-      row1.nombre, 
-      row1.foto, 
+      row1.id,
+      row1.direccion,
+      row1.provincia,
+      row1.canton,
+      row1.distrito,
+      row1.tamano,
+      row1.contacto,
+      row1.edad,
+      row1.descripcion,
+      row1.nombre,
+      row1.foto,
       row1.estadoAdopcion,
       row1.userId,
       [],
       row1.nombreUsuario
     );
 
-    
-    result.forEach(row => {
+    result.forEach((row) => {
       // Si hay una raza asociada, la añadimos al array de razas
       if (row.razaNombre) {
         perro.razas.push({
           nombre: row.razaNombre,
-          probabilidad: row.probabilidad
+          probabilidad: row.probabilidad,
+          id:row.razaId
         });
       }
     });
@@ -120,12 +125,12 @@ const getPerroById = (id, callback) => {
   });
 };
 const getPerrosByUsuario = (idUsuario, callback) => {
-  if (typeof callback !== 'function') {
-    throw new Error('El callback proporcionado no es una función');
+  if (typeof callback !== "function") {
+    throw new Error("El callback proporcionado no es una función");
   }
   const sql = `
   SELECT 
-    p.id, p.ubicacion, p.tamano, p.contacto, p.edad, p.descripcion, 
+    p.id, p.direccion,p.provincia,p.canton,p.distrito, p.tamano, p.contacto, p.edad, p.descripcion, 
     p.nombre, p.foto, p.estadoAdopcion, p.userId, 
     r.nombre AS razaNombre, pr.probabilidad, u.nombre as nombreUsuario 
   FROM perro p
@@ -139,14 +144,17 @@ const getPerrosByUsuario = (idUsuario, callback) => {
     }
     const perrosMap = new Map();
 
-    results.forEach(row => {
+    results.forEach((row) => {
       const perroId = row.id;
 
       // Si el perro aún no existe en el mapa, lo creamos
       if (!perrosMap.has(perroId)) {
         perrosMap.set(perroId, {
           id: perroId,
-          ubicacion: row.ubicacion,
+          direccion: row.direccion,
+          provincia: row.provincia,
+          canton: row.canton,
+          distrito: row.distrito,
           tamano: row.tamano,
           contacto: row.contacto,
           edad: row.edad,
@@ -156,7 +164,7 @@ const getPerrosByUsuario = (idUsuario, callback) => {
           estadoAdopcion: row.estadoAdopcion,
           userId: row.userId,
           razas: [],
-          nombreUsuario:row.nombreUsuario
+          nombreUsuario: row.nombreUsuario,
         });
       }
 
@@ -164,7 +172,7 @@ const getPerrosByUsuario = (idUsuario, callback) => {
       if (row.razaNombre) {
         perrosMap.get(perroId).razas.push({
           nombre: row.razaNombre,
-          probabilidad: row.probabilidad
+          probabilidad: row.probabilidad,
         });
       }
     });
@@ -179,24 +187,27 @@ const getPerrosByUsuario = (idUsuario, callback) => {
 
 // Crear una nueva Perro
 const createPerro = (PerroData, razaArray, callback) => {
-  if (typeof callback !== 'function') {
-    throw new Error('El callback proporcionado no es una función');
+  if (typeof callback !== "function") {
+    throw new Error("El callback proporcionado no es una función");
   }
   try {
     Perro.validate(PerroData); // Validar el objeto contra la clase
-    db.query('INSERT INTO perro SET ?', PerroData, (err, result) => {
+    db.query("INSERT INTO perro SET ?", PerroData, (err, result) => {
       if (err) {
         return callback(err, null);
       }
       var newPerro = new Perro(
-        result.insertId, 
-        PerroData.ubicacion, 
-        PerroData.tamano, 
-        PerroData.contacto, 
-        PerroData.edad, 
-        PerroData.descripcion, 
-        PerroData.nombre, 
-        PerroData.foto, 
+        result.insertId,
+        PerroData.direccion,
+        PerroData.provincia,
+        PerroData.canton,
+        PerroData.distrito,
+        PerroData.tamano,
+        PerroData.contacto,
+        PerroData.edad,
+        PerroData.descripcion,
+        PerroData.nombre,
+        PerroData.foto,
         PerroData.estadoAdopcion,
         PerroData.userId,
         []
@@ -213,11 +224,14 @@ const createPerro = (PerroData, razaArray, callback) => {
               probabilidad: parseFloat(probabilidad),
             };
 
-            razaPerroModel.createRazaPerro(razaPerroData, (err, newRazaPerro) => {
-              if (err) {
-                console.error('Error al asociar la raza con el perro:', err);
+            razaPerroModel.createRazaPerro(
+              razaPerroData,
+              (err, newRazaPerro) => {
+                if (err) {
+                  console.error("Error al asociar la raza con el perro:", err);
+                }
               }
-            });
+            );
           }
         });
       }
@@ -230,13 +244,13 @@ const createPerro = (PerroData, razaArray, callback) => {
 
 const eliminarPerro = (id, callback) => {
   // Eliminar las razas asociadas
-  db.query('DELETE FROM perro_razas WHERE perro_id = ?', [id], (err) => {
+  db.query("DELETE FROM perro_razas WHERE perro_id = ?", [id], (err) => {
     if (err) {
       return callback(err, null);
     }
 
     // Ahora eliminar el perro
-    db.query('DELETE FROM perro WHERE id = ?', [id], (err) => {
+    db.query("DELETE FROM perro WHERE id = ?", [id], (err) => {
       if (err) {
         return callback(err, null);
       }
@@ -245,35 +259,54 @@ const eliminarPerro = (id, callback) => {
   });
 };
 
-const modificarPerro = (datos,razaArray, callback) => {
-  if (typeof callback !== 'function') {
-    throw new Error('El callback proporcionado no es una función');
+const modificarPerro = (datos, razaArray, callback) => {
+  if (typeof callback !== "function") {
+    throw new Error("El callback proporcionado no es una función");
   }
-  try{
-    const eliminarRazasQuery = 'DELETE FROM perro_razas WHERE perro_id = ?';
-  
-  db.query(eliminarRazasQuery, [datos.id], (error) => {
+  try {
+    const eliminarRazasQuery = "DELETE FROM perro_razas WHERE perro_id = ?";
+
+    db.query(eliminarRazasQuery, [datos.id], (error) => {
       if (error) {
-          return callback(error);
+        return callback(error);
       }
       console.log("Eliminó las razas asignadas");
 
       // Actualiza la información del perro
-      const actualizarPerroQuery = 'UPDATE perro SET ubicacion = ?, tamano = ?, contacto = ?, edad = ?, nombre = ?, descripcion = ?, foto = ? WHERE id = ?';
-      
-      db.query(actualizarPerroQuery, [datos.ubicacion,datos.tamano,datos.contacto,datos.edad,datos.nombre,datos.descripcion,datos.foto,datos.id], (error, resultado) => {
+      const actualizarPerroQuery =
+        "UPDATE perro SET direccion = ?,provincia = ?,canton = ?,distrito = ?, tamano = ?, contacto = ?, edad = ?, nombre = ?, descripcion = ?, foto = ? WHERE id = ?";
+
+      db.query(
+        actualizarPerroQuery,
+        [
+          datos.direccion,
+          datos.provincia,
+          datos.canton,
+          datos.distrito,
+          datos.tamano,
+          datos.contacto,
+          datos.edad,
+          datos.nombre,
+          datos.descripcion,
+          datos.foto,
+          datos.id,
+        ],
+        (error, resultado) => {
           if (error) {
-              return callback(error);
+            return callback(error);
           }
           var newPerro = new Perro(
-            resultado.insertId, 
-            resultado.ubicacion, 
-            resultado.tamano, 
-            resultado.contacto, 
-            resultado.edad, 
-            resultado.descripcion, 
-            resultado.nombre, 
-            resultado.foto, 
+            resultado.insertId,
+            resultado.direccion,
+            resultado.provincia,
+            resultado.canton,
+            resultado.distrito,
+            resultado.tamano,
+            resultado.contacto,
+            resultado.edad,
+            resultado.descripcion,
+            resultado.nombre,
+            resultado.foto,
             resultado.estadoAdopcion,
             resultado.userId,
             []
@@ -289,23 +322,29 @@ const modificarPerro = (datos,razaArray, callback) => {
                   raza_id: id,
                   probabilidad: parseFloat(probabilidad),
                 };
-    
-                razaPerroModel.createRazaPerro(razaPerroData, (err, newRazaPerro) => {
-                  if (err) {
-                    console.error('Error al asociar la raza con el perro:', err);
+
+                razaPerroModel.createRazaPerro(
+                  razaPerroData,
+                  (err, newRazaPerro) => {
+                    if (err) {
+                      console.error(
+                        "Error al asociar la raza con el perro:",
+                        err
+                      );
+                    }
                   }
-                });
+                );
               }
             });
           }
           callback(null, newPerro);
-      });
-  });
+        }
+      );
+    });
   } catch (error) {
     return callback(error, null); // Devuelve un error si la validación falla
   }
 };
-
 
 // Exportar las funciones
 module.exports = {
@@ -314,5 +353,5 @@ module.exports = {
   getPerrosByUsuario,
   createPerro,
   eliminarPerro,
-  modificarPerro
+  modificarPerro,
 };

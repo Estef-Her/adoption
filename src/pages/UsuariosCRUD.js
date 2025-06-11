@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../axiosConfig';
+import axios from 'axios';
 import DataTable,{createTheme} from 'react-data-table-component';
 import Swal from 'sweetalert2';
 import { Card, Button, Container, Row, Col ,Form , Modal,Alert} from 'react-bootstrap';
@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faEye } from '@fortawesome/free-solid-svg-icons';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 // Definir un tema personalizado
 createTheme('customTheme', {
   text: {
@@ -39,6 +40,7 @@ function UsuariosCRUD() {
   const [error, setError] = useState('');
     const [loading, setLoading] = useState(false); 
     const [selectedUser, setSelectedUser] = useState(null);
+    const [modCargado, setModCargado] = useState(false);  
 
   const formik = useFormik({
     initialValues: {
@@ -54,11 +56,12 @@ function UsuariosCRUD() {
     onSubmit: async (values) => {
       try {
         setLoading(true);
+        setModCargado(true);
         if (selectedUser){
           if(!values.id){
             values.id = selectedUser.id;
           }
-          const response = await api.put(URL_SERVICIO + 'modificarUsuario', values,{
+          const response = await axios.put(URL_SERVICIO + 'modificarUsuario', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
@@ -69,7 +72,7 @@ function UsuariosCRUD() {
             ListarUsuarios();
           }
         }else{
-          const response = await api.post(URL_SERVICIO + 'registroUsuarioAd', values,{
+          const response = await axios.post(URL_SERVICIO + 'registroUsuarioAd', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
@@ -84,19 +87,25 @@ function UsuariosCRUD() {
         setError('Error al crear el usuario. Por favor, intenta de nuevo.');
         toast.error('Error al crear el usuario. Por favor, intenta de nuevo.');
         setLoading(false);
+        setModCargado(false);
       }
     },
   });
   const ListarUsuarios = ()=>{
-    api.get(URL_SERVICIO + 'usuarios',{
+    setModCargado(true);
+    axios.get(URL_SERVICIO + 'usuarios',{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }}) // Cambia esta URL a tu endpoint
       .then(response => {
         setUsers(response.data);
-        setUsersC(response.data)
+        setUsersC(response.data);
+        setModCargado(false);
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+        setModCargado(false);
+      });
   }
   useEffect(() => {
     ListarUsuarios();
@@ -118,17 +127,20 @@ function UsuariosCRUD() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        api.delete(URL_SERVICIO+`usuario/${userId}`,{
+        setModCargado(true);
+        axios.delete(URL_SERVICIO+`usuario/${userId}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
           .then(() => {
             ListarUsuarios();
             toast.success('El usuario ha sido eliminado exitosamente!'); // Mostrar mensaje emergente
+            setModCargado(false);
           })
           .catch(error => {
             console.error('Error eliminando el usuario:', error);
             toast.error('No se pudo eliminar el usuario.'); // Mostrar mensaje emergente
+            setModCargado(false);
           });
       }
     });
@@ -194,6 +206,7 @@ function UsuariosCRUD() {
   };
   return (
     <div className="container mt-4">
+      <LoadingModal visible={modCargado} />
 <div className="row align-items-center mb-3">
   <h4 className="col-9">Usuarios</h4>
   <div className="col-3 text-end">

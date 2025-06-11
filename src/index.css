@@ -401,9 +401,10 @@ justify-self: center;
   background-color: #145dbf;
 }
 .animal-card-detail {
-  max-width: 600px;
+  max-width: 800px;
   margin: auto;
   border: none;
+  margin-bottom: 20px;
 }
 
 .card-header-detail {
@@ -422,10 +423,11 @@ justify-self: center;
 }
 
 .card-img-detail {
-  max-height: 900px;
-  object-fit: cover;
+  max-height: 500px;
+  object-fit: contain;
   border-radius: 10px;
   width: 100%;
+  margin-top: 0px !important;
 }
 
 .animal-details strong {
@@ -443,6 +445,34 @@ justify-self: center;
   font-size: 1.2rem;
   font-weight: bold;
 }
+.animal-description {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.animal-age,
+.animal-breed,
+.animal-contacto,
+.animal-usuario,
+.animal-ubicacion,
+.animal-direccion {
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.animal-age strong,
+.animal-breed strong,
+.animal-contacto strong,
+.animal-usuario strong,
+.animal-ubicacion strong,
+.animal-direccion strong {
+  color: var(--secundary-colorAdd, #007bff);
+  font-weight: 600;
+}
+
 .bg-light {
   border-radius: 10px;
   height: auto;

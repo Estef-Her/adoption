@@ -4,6 +4,8 @@ import {Link,useNavigate} from 'react-router-dom';
 import {Button} from 'react-bootstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faKey} from '@fortawesome/free-solid-svg-icons';
+import LoadingModal from '../LoadingModal'
+
 function Cuenta() {
   const user = JSON.parse(localStorage.getItem('user'));
   const navigate = useNavigate();

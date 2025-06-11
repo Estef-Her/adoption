@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import api from '../axiosConfig';
+import axios from 'axios';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -21,6 +21,7 @@ function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
 const [user, setUser]=React.useState(null);
 const [loader, setLoader]=React.useState(false);
+const [modCargado, setModCargado] = React.useState(false);  
 
   const formik = useFormik({
     initialValues: {
@@ -31,7 +32,8 @@ const [loader, setLoader]=React.useState(false);
     onSubmit: async (values) => {
       try {
         setLoader(true);
-        const response = await api.post(URL_SERVICIO + 'login', values,{
+        setModCargado(true);
+        const response = await axios.post(URL_SERVICIO + 'login', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }
@@ -44,10 +46,12 @@ const [loader, setLoader]=React.useState(false);
         console.log(response.data); // Aquí podrías guardar un token o manejar la respuesta como necesites
         setLoader(false);
         navigate('/'); // Redirigir al usuario al dashboard o a la página deseada
+        setModCargado(false);
       } catch (error) {
         setIsAuthenticated(false);
         setError('Credenciales inválidas. Por favor, intenta de nuevo.');
         setLoader(false);
+        setModCargado(false);
       }
     },
   });
@@ -58,7 +62,8 @@ const [loader, setLoader]=React.useState(false);
 
     // Enviar el token de Google al backend para su validación
     try {
-      const res = await api.post(URL_SERVICIO + 'auth/google', { token: tokenId },{
+      setModCargado(true);
+      const res = await axios.post(URL_SERVICIO + 'auth/google', { token: tokenId },{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }
@@ -67,9 +72,11 @@ const [loader, setLoader]=React.useState(false);
       localStorage.setItem('tokenn', token);
       localStorage.setItem('user', JSON.stringify(user));
       setIsAuthenticated(true);
+      setModCargado(false);
       navigate('/'); // Redirigir al dashboard
     } catch (error) {
       setError('Error al autenticar con Google');
+      setModCargado(false);
     }
   };
 
@@ -106,6 +113,7 @@ const [loader, setLoader]=React.useState(false);
 
   return (
     <Container className="login-container">
+      <LoadingModal visible={modCargado} />
       <div className="login-box">
         <div className="logo-container">
           <img src={logo} alt="Logo" className="app-logo" />

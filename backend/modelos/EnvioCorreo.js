@@ -14,8 +14,8 @@ const transporter = nodemailer.createTransport({
 });
 
 // Función para enviar un correo de recuperación
-const sendPasswordRecoveryEmail = async (email, codigo, user) => {
-  const recoveryLink = `http://localhost:3000/recuperar-contrasena`; // URL de recuperación
+const sendPasswordRecoveryEmail = async (email, codigo, user,recoveryLinkP) => {
+  const recoveryLink = recoveryLinkP+`adoption/recuperar-contrasena`; // URL de recuperación
 
   const mailOptions = {
     from: process.env.MAIL_USER,
@@ -29,7 +29,7 @@ const sendPasswordRecoveryEmail = async (email, codigo, user) => {
     Hola <strong>${user.nombre}</strong>, tu código de recuperación es <strong>${codigo}</strong>.  
     Ingresa este código en la página de recuperación para restablecer tu contraseña.  
   </p>
-  <a href="http://localhost:3000/adoption" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
+  <a href="${recoveryLink}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
     Ingresar a la Plataforma
   </a>
 </div>`,
@@ -44,8 +44,8 @@ const sendPasswordRecoveryEmail = async (email, codigo, user) => {
   }
 };
 // Función para enviar un correo al crear usuario
-const enviarCorreoRegistro = async (email, contrasena,user) => {
-  const link = `http://localhost:3000/adoption/login`; // URL de recuperación
+const enviarCorreoRegistro = async (email, contrasena,user,recoveryLinkP) => {
+  const link = recoveryLinkP+`adoption/login`; // URL de recuperación
   const mailOptions = {
     from: process.env.MAIL_USER,
     to: email,
@@ -59,7 +59,7 @@ const enviarCorreoRegistro = async (email, contrasena,user) => {
     <strong style="color: #d1956a; font-size: 18px;">${contrasena}</strong>.
   </p>
   <p style="font-size: 16px; color: #777;">Recuerde crear una nueva contraseña al ingresar a la plataforma.</p>
-  <a href="http://localhost:3000/adoption" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
+  <a href="${link}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
     Ingresar a la Plataforma
   </a>
 </div>`,
@@ -74,8 +74,8 @@ const enviarCorreoRegistro = async (email, contrasena,user) => {
   }
 };
 // Función para enviar un correo al modificar un usuario
-const enviarCorreoModificacion = async (email, contrasena,user) => {
-  const link = `http://localhost:3000/adoption/login`; // URL de recuperación
+const enviarCorreoModificacion = async (email, contrasena,user,recoveryLinkP) => {
+  const link = recoveryLinkP+`adoption/login`; // URL de recuperación
   const mailOptions = {
     from: process.env.MAIL_USER,
     to: email,
@@ -87,7 +87,7 @@ const enviarCorreoModificacion = async (email, contrasena,user) => {
     Hola <strong>${user.nombre}</strong>, sus datos han sido modificados en la plataforma <strong>Encuentra a tu Amigo</strong>.  
     Le recomendamos iniciar sesión y verificar la información.
   </p>
-  <a href="http://localhost:3000/adoption" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
+  <a href="${link}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
     Iniciar Sesión
   </a>
 </div>

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import api from '../axiosConfig';
+import axios from 'axios';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import LoaderComponent from 'components/Loader';
 import { URL_SERVICIO } from 'Clases/Constantes';
+import LoadingModal from '../LoadingModal'
 
 const validationSchema = yup.object().shape({
   codigo: yup.string().required('El código es requerido'),
@@ -27,6 +28,7 @@ function RecuperarContrasena() {
   const [email, setEmail] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const navigate = useNavigate();  // Reemplazamos useHistory por useNavigate
+  const [modCargado, setModCargado] = useState(false);  
 
   const formikEmail = useFormik({
     initialValues: { email: '' },
@@ -34,9 +36,10 @@ function RecuperarContrasena() {
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
+        setModCargado(true);
         console.log("Entro a submit");
         // Realizar una solicitud POST al backend para la recuperación de contraseña
-        const response = await api.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email },{
+        const response = await axios.post(URL_SERVICIO + 'solicitar-restablecer', { email: values.email },{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
@@ -45,10 +48,14 @@ function RecuperarContrasena() {
         setError(response.data.error==true ? response.data.message:'');
         if(response.data.error != true)setIsResetting(true); // Ahora se muestra el formulario para restablecer la contraseña
         setIsLoading(false);
+        setTimeout(()=>{
+          setModCargado(false);
+        },1000);
       } catch (error) {
         setMessage('');
         setError('No se pudo enviar el enlace de recuperación. Por favor, intenta de nuevo.');
         setIsLoading(false);
+        setModCargado(false);
       }
     },
   });
@@ -59,8 +66,9 @@ function RecuperarContrasena() {
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
+        setModCargado(true);
         // Realizar la solicitud para restablecer la contraseña
-        const response = await api.post(URL_SERVICIO + 'restablecer-contrasena', {
+        const response = await axios.post(URL_SERVICIO + 'restablecer-contrasena', {
           codigo: values.codigo,
           nuevaContrasena: values.nuevaContrasena,
           email:email
@@ -74,16 +82,18 @@ function RecuperarContrasena() {
         // Redirigir al login
         if(response.data.error != true)setTimeout(() => navigate('/login'), 3000); // Usamos navigate en lugar de useHistory
         setIsLoading(false);
+        setModCargado(false);
       } catch (error) {
         setMessage('');
         setError('Error al restablecer la contraseña. Por favor, intenta de nuevo.');
         setIsLoading(false);
+        setModCargado(false);
       }
     },
   });
 
   return (
-    isLoading ? <LoaderComponent/> : <Container className="password-recovery-container">
+    modCargado ? <LoadingModal visible={modCargado} /> : <Container className="password-recovery-container">
       <h3>Recuperación de Contraseña</h3>
 
       {/* Mensajes de éxito o error */}

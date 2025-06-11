@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import api from '../axiosConfig';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import Swal from 'sweetalert2'; // Para las alertas emergentes
 import { URL_SERVICIO } from 'Clases/Constantes';
 import { useParams } from 'react-router-dom';
+import LoadingModal from '../LoadingModal'
 
 function MisPublicaciones() {
   const { id } = useParams();
   const [animals, setAnimals] = useState([]);
   const [filteredAnimals, setFilteredAnimals] = useState([]);
+  const [modCargado, setModCargado] = useState(false);  
 
   useEffect(() => {
+    setModCargado(true);
     const user = JSON.parse(localStorage.getItem('user'));
     var ide=id!=null && id != "0"? id : user.id;
-    api.get(URL_SERVICIO+`animalsPorUsuario/${ide}`,{
+    axios.get(URL_SERVICIO+`animalsPorUsuario/${ide}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
       .then(response => {
         setAnimals(response.data);
         setFilteredAnimals(response.data);
+        setModCargado(false);
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        console.error(error);
+        setModCargado(false);
+      });
   }, []);
   const handleDelete = (animalId) => {
     Swal.fire({
@@ -36,7 +43,8 @@ function MisPublicaciones() {
       cancelButtonText:'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        api.delete(URL_SERVICIO+`animals/${animalId}`,{
+        setModCargado(true);
+        axios.delete(URL_SERVICIO+`animals/${animalId}`,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }})
@@ -44,16 +52,19 @@ function MisPublicaciones() {
             setAnimals(animals.filter(animal => animal.id !== animalId));
             setFilteredAnimals(filteredAnimals.filter(animal => animal.id !== animalId));
             Swal.fire('Eliminado!', 'Tu publicación ha sido eliminada.', 'success');
+            setModCargado(false);
           })
           .catch(error => {
             console.error('Error eliminando la publicación:', error);
             Swal.fire('Error!', 'No se pudo eliminar la publicación.', 'error');
+            setModCargado(false);
           });
       }
     });
   };
   return (
     <Container className="mt-4">
+      <LoadingModal visible={modCargado} />
      <h4>Mis publicaciones</h4>
       <Row className="mt-4">
         {filteredAnimals.map(animal => (

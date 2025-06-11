@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import '@tensorflow/tfjs'; // sin versiones "core", "node" o "tfjs-backend-*"
-
+import LoadingModal from '../LoadingModal'
 
 const DogDetector = () => {
   const [model, setModel] = useState(null);

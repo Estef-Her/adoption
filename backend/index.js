@@ -1,10 +1,11 @@
-const https = require('https');
+const https = require("https");
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const fsp = require('fs').promises;  // IMPORTANTE: .promises
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs"); // Si estás usando contraseñas encriptadas
 const Token = require("./token");
@@ -17,7 +18,9 @@ const tokenBlacklist = new Set();
 const sharp = require("sharp");
 const rimraf = require("rimraf");
 const EnvioCorreo = require("./modelos/EnvioCorreo");
-
+const URL_SITE = "https://estef-her.github.io/";
+const URL_SITEL = "http://localhost:3000/";
+const URL_USAR = URL_SITE;
 
 const app = express();
 
@@ -107,7 +110,10 @@ app.get("/animals/:id", (req, res) => {
 app.post("/animals", upload.single("imageFile"), async (req, res) => {
   try {
     const {
-      ubicacion,
+      direccion,
+      provincia,
+      canton,
+      distrito,
       tamano,
       contacto,
       edad,
@@ -127,7 +133,10 @@ app.post("/animals", upload.single("imageFile"), async (req, res) => {
     if (
       !nombre ||
       !descripcion ||
-      !ubicacion ||
+      !direccion ||
+      !provincia ||
+      !canton ||
+      !distrito ||
       !usuario ||
       !tamano ||
       !contacto ||
@@ -144,7 +153,11 @@ app.post("/animals", upload.single("imageFile"), async (req, res) => {
 
     // Leer la imagen y convertirla a base64
     const imageFile = req.file; // Cambiado a req.file
-    const imageBuffer = await sharp(imageFile.path)
+    const tempPath     = req.file.path; 
+    const inputBuffer  = await fsp.readFile(tempPath);
+    await tryUnlink(tempPath); 
+    
+    const imageBuffer = await sharp(inputBuffer)
       .resize({ width: 500 }) // Ajusta el tamaño según sea necesario
       .toBuffer(); // Obtener el búfer redimensionado
 
@@ -152,7 +165,10 @@ app.post("/animals", upload.single("imageFile"), async (req, res) => {
     // const imageBase64 = imageBuffer.toString('base64');
 
     const newAnimal = {
-      ubicacion,
+      direccion,
+      provincia,
+      canton,
+      distrito,
       tamano: parseInt(tamano), // Asegúrate de convertir a número si es necesario
       contacto,
       edad: parseInt(edad), // Asegúrate de convertir a número si es necesario
@@ -168,11 +184,7 @@ app.post("/animals", upload.single("imageFile"), async (req, res) => {
         console.error("Error al crear el animal en la base de datos:", err);
         return res.status(500).json({ error: "Error al crear el animal" });
       }
-      fs.unlink(imageFile.path, (err) => {
-        if (err) {
-          console.error("Error al eliminar el archivo:", err);
-        }
-      });
+
       res.json(createdAnimal);
     });
   } catch (error) {
@@ -202,7 +214,10 @@ app.put("/animals", upload.single("imageFile"), async (req, res) => {
   try {
     const {
       id,
-      ubicacion,
+      direccion,
+      provincia,
+      canton,
+      distrito,
       tamano,
       contacto,
       edad,
@@ -223,7 +238,10 @@ app.put("/animals", upload.single("imageFile"), async (req, res) => {
       !id ||
       !nombre ||
       !descripcion ||
-      !ubicacion ||
+      !direccion ||
+      !provincia ||
+      !canton ||
+      !distrito ||
       !usuario ||
       !tamano ||
       !contacto ||
@@ -240,7 +258,11 @@ app.put("/animals", upload.single("imageFile"), async (req, res) => {
 
     // Leer la imagen y convertirla a base64
     const imageFile = req.file; // Cambiado a req.file
-    const imageBuffer = await sharp(imageFile.path)
+    const tempPath     = req.file.path; 
+    const inputBuffer  = await fsp.readFile(tempPath);
+    await tryUnlink(tempPath); 
+    
+    const imageBuffer = await sharp(inputBuffer)
       .resize({ width: 500 }) // Ajusta el tamaño según sea necesario
       .toBuffer(); // Obtener el búfer redimensionado
 
@@ -249,7 +271,10 @@ app.put("/animals", upload.single("imageFile"), async (req, res) => {
 
     const newAnimal = {
       id,
-      ubicacion,
+      direccion,
+      provincia,
+      canton,
+      distrito,
       tamano: parseInt(tamano), // Asegúrate de convertir a número si es necesario
       contacto,
       edad: parseInt(edad), // Asegúrate de convertir a número si es necesario
@@ -260,23 +285,48 @@ app.put("/animals", upload.single("imageFile"), async (req, res) => {
       userId: userIdd,
     };
     const razaArray = JSON.parse(razas);
-    perroModel.modificarPerro(newAnimal, razaArray, (err, createdAnimal) => {
-      if (err) {
-        console.error("Error al modificar el animal en la base de datos:", err);
-        return res.status(500).json({ error: "Error al modificar el animal" });
-      }
-      fs.unlink(imageFile.path, (err) => {
+    perroModel.modificarPerro(
+      newAnimal,
+      razaArray,
+      async (err, createdAnimal) => {
         if (err) {
-          console.error("Error al eliminar el archivo:", err);
+          console.error(
+            "Error al modificar el animal en la base de datos:",
+            err
+          );
+          return res
+            .status(500)
+            .json({ error: "Error al modificar el animal" });
         }
-      });
-      res.json(createdAnimal);
-    });
+
+        res.json(createdAnimal);
+      }
+    );
   } catch (error) {
     console.error("Error en el manejo de la solicitud:", error); // Añadir log para el error
     return res.status(500).json({ error: "Error al procesar la solicitud." });
   }
 });
+async function tryUnlink(path, retries = 5, delay = 12000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await fsp.unlink(path);
+      console.log("Archivo eliminado");
+      return;
+    } catch (err) {
+      if (err.code === "EPERM" || err.code === "EBUSY") {
+        const minutos = delay / (1000 * 60);
+
+        console.log(`Intento ${i + 1} fallido, reintentando en ${minutos} minutos...`);
+        console.log(err);
+        await new Promise((res) => setTimeout(res, delay));
+      } else {
+        throw err;
+      }
+    }
+  }
+  console.error("No se pudo eliminar el archivo tras varios intentos.");
+}
 //Cuenta
 // Ruta de login
 app.post("/login", (req, res) => {
@@ -301,7 +351,7 @@ app.post("/login", (req, res) => {
         email: user.correo,
         name: user.nombre,
         phone: user.telefono,
-        rol: { id: user.rol_id, descripcion: user.rol_descripcion }
+        rol: { id: user.rol_id, descripcion: user.rol_descripcion },
       },
     });
   });
@@ -350,8 +400,8 @@ app.get("/razas", (req, res) => {
 
 //Usuario
 app.post("/registroUsuario", (req, res) => {
-  const { nombre, telefono, correo, contrasena,rol } = req.body;
-  const nuevoUsuario = { nombre, telefono, correo, contrasena ,rol};
+  const { nombre, telefono, correo, contrasena, rol } = req.body;
+  const nuevoUsuario = { nombre, telefono, correo, contrasena, rol };
 
   // Crear el usuario en la base de datos
   usuarioModel.createUsuario(nuevoUsuario, (err, usuarioCreado) => {
@@ -373,10 +423,10 @@ app.get("/usuarios", (req, res) => {
   });
 });
 //Usuario por administrador
-app.post("/registroUsuarioAd",async (req, res) => {
-  const { nombre, telefono, correo,rol } = req.body;
+app.post("/registroUsuarioAd", async (req, res) => {
+  const { nombre, telefono, correo, rol } = req.body;
   var contrasena = usuarioModel.generarContrasena();
-  const nuevoUsuario = { nombre, telefono, correo, contrasena ,rol};
+  const nuevoUsuario = { nombre, telefono, correo, contrasena, rol };
   // Crear el usuario en la base de datos
   usuarioModel.createUsuario(nuevoUsuario, async (err, usuarioCreado) => {
     if (err) {
@@ -386,30 +436,50 @@ app.post("/registroUsuarioAd",async (req, res) => {
       // Crear un token para el restablecimiento de la contraseña
       // const token = tokenInstance.generarToken(usuario);
 
-      await EnvioCorreo.enviarCorreoRegistro(nuevoUsuario.correo, contrasena,usuarioCreado);
+      await EnvioCorreo.enviarCorreoRegistro(
+        nuevoUsuario.correo,
+        contrasena,
+        usuarioCreado,
+        URL_USAR
+      );
       res
-      .status(201)
-      .json({ message: "Usuario creado exitosamente", usuario: usuarioCreado });
+        .status(201)
+        .json({
+          message: "Usuario creado exitosamente",
+          usuario: usuarioCreado,
+        });
     } catch (error) {
-      return res.status(200).json({ message: "Error al enviar el correo",error:true });
+      return res
+        .status(200)
+        .json({ message: "Error al enviar el correo", error: true });
     }
   });
 });
-app.put("/modificarUsuario",async (req, res) => {
-  const { nombre, telefono, correo,rol ,id} = req.body;
-  const nuevoUsuario = { nombre, telefono, correo ,rol,id};
+app.put("/modificarUsuario", async (req, res) => {
+  const { nombre, telefono, correo, rol, id } = req.body;
+  const nuevoUsuario = { nombre, telefono, correo, rol, id };
   // Crear el usuario en la base de datos
   usuarioModel.modificarUsuario(nuevoUsuario, async (err, usuarioCreado) => {
     if (err) {
       return res.status(500).json({ error: "Error al modificar el usuario" });
     }
     try {
-      await EnvioCorreo.enviarCorreoModificacion(nuevoUsuario.correo, '',nuevoUsuario);
+      await EnvioCorreo.enviarCorreoModificacion(
+        nuevoUsuario.correo,
+        "",
+        nuevoUsuario,
+        URL_USAR
+      );
       res
-      .status(201)
-      .json({ message: "Usuario modificado exitosamente", usuario: usuarioCreado });
+        .status(201)
+        .json({
+          message: "Usuario modificado exitosamente",
+          usuario: usuarioCreado,
+        });
     } catch (error) {
-      return res.status(200).json({ message: "Error al enviar el correo",error:true });
+      return res
+        .status(200)
+        .json({ message: "Error al enviar el correo", error: true });
     }
   });
 });
@@ -449,7 +519,9 @@ app.post("/solicitar-restablecer", async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.status(200).json({ message: "El correo es obligatorio",error:true });
+    return res
+      .status(200)
+      .json({ message: "El correo es obligatorio", error: true });
   }
 
   // Buscar al usuario en la base de datos
@@ -457,15 +529,21 @@ app.post("/solicitar-restablecer", async (req, res) => {
   usuarioModel.getUsuarioByEmail(email, async (err, user) => {
     if (err) {
       if (err.message === "Correo no encontrado") {
-        return res.status(200).json({ message: "Correo no encontrado",error:true });
+        return res
+          .status(200)
+          .json({ message: "Correo no encontrado", error: true });
       }
-      return res.status(200).json({ message: "Error interno del servidor",error:true });
+      return res
+        .status(200)
+        .json({ message: "Error interno del servidor", error: true });
     }
 
     const usuario = user;
 
     if (!usuario) {
-      return res.status(200).json({ message: "Correo no encontrado",error:true });
+      return res
+        .status(200)
+        .json({ message: "Correo no encontrado", error: true });
     }
 
     try {
@@ -482,16 +560,29 @@ app.post("/solicitar-restablecer", async (req, res) => {
           if (err) {
             return res
               .status(200)
-              .json({ message: "Error al guardar el código de recuperación",error:true });
+              .json({
+                message: "Error al guardar el código de recuperación",
+                error: true,
+              });
           }
-          await EnvioCorreo.sendPasswordRecoveryEmail(email, recoveryCode,usuarioActualizado);
+          await EnvioCorreo.sendPasswordRecoveryEmail(
+            email,
+            recoveryCode,
+            usuario,
+            URL_USAR
+          );
           return res
             .status(200)
-            .json({ message: "Correo enviado para restablecer la contraseña",error:false });
+            .json({
+              message: "Correo enviado para restablecer la contraseña",
+              error: false,
+            });
         }
       );
     } catch (error) {
-      return res.status(200).json({ message: "Error al enviar el correo",error:true });
+      return res
+        .status(200)
+        .json({ message: "Error al enviar el correo", error: true });
     }
   });
 });
@@ -503,7 +594,10 @@ app.post("/restablecer-contrasena", async (req, res) => {
   if (!codigo || !nuevaContrasena) {
     return res
       .status(400)
-      .json({ message: "Código y nueva contraseña son requeridos",error:true });
+      .json({
+        message: "Código y nueva contraseña son requeridos",
+        error: true,
+      });
   }
 
   try {
@@ -511,46 +605,67 @@ app.post("/restablecer-contrasena", async (req, res) => {
     usuarioModel.getUsuarioByEmail(email, async (err, user) => {
       if (err) {
         if (err.message === "Correo no encontrado") {
-          return res.status(200).json({ message: "Correo no encontrado",error:true });
+          return res
+            .status(200)
+            .json({ message: "Correo no encontrado", error: true });
         }
-        return res.status(200).json({ message: "Error interno del servidor",error:true });
+        return res
+          .status(200)
+          .json({ message: "Error interno del servidor", error: true });
       }
       if (!user) {
-        return res.status(200).json({ message: "Usuario no encontrado",error:true });
+        return res
+          .status(200)
+          .json({ message: "Usuario no encontrado", error: true });
       }
       usuarioModel.verifyRecoveryCode(user.id, codigo, async (err, isValid) => {
         if (err || !isValid) {
-          return res
-            .status(200)
-            .json({
-              message: "El código de recuperación es incorrecto o ha expirado",
-            });
+          return res.status(200).json({
+            message: "El código de recuperación es incorrecto o ha expirado",
+          });
         }
 
         // Actualizar la contraseña del usuario en la base de datos
-        usuarioModel.actualizarContrasena(user.id, nuevaContrasena, async (err,usuarioMod)=>{
-          if (err) {
-            return res.status(200).json({ message: "Error al guardar la contraseña",error:true });
+        usuarioModel.actualizarContrasena(
+          user.id,
+          nuevaContrasena,
+          async (err, usuarioMod) => {
+            if (err) {
+              return res
+                .status(200)
+                .json({
+                  message: "Error al guardar la contraseña",
+                  error: true,
+                });
+            }
+            return res
+              .status(200)
+              .json({
+                message: "Contraseña restablecida con éxito",
+                error: false,
+              });
           }
-          return res
-          .status(200)
-          .json({ message: "Contraseña restablecida con éxito",error:false });
-        });
+        );
       });
     });
   } catch (error) {
-    return res.status(400).json({ message: "Código inválido o expirado",error:true });
+    return res
+      .status(400)
+      .json({ message: "Código inválido o expirado", error: true });
   }
 });
 
 // Endpoint para cambiar la contraseña
 app.post("/cambiar-contrasena", async (req, res) => {
-  const { nuevaContrasena,actualContrasena, email } = req.body;
+  const { nuevaContrasena, actualContrasena, email } = req.body;
 
   if (!actualContrasena || !nuevaContrasena) {
     return res
       .status(400)
-      .json({ message: "Contraseña actual y nueva contraseña son requeridos",error:true });
+      .json({
+        message: "Contraseña actual y nueva contraseña son requeridos",
+        error: true,
+      });
   }
 
   try {
@@ -558,41 +673,63 @@ app.post("/cambiar-contrasena", async (req, res) => {
     usuarioModel.getUsuarioByEmail(email, async (err, user) => {
       if (err) {
         if (err.message === "Correo no encontrado") {
-          return res.status(200).json({ message: "Correo no encontrado",error:true });
-        }
-        return res.status(200).json({ message: "Error interno del servidor",error:true });
-      }
-      if (!user) {
-        return res.status(200).json({ message: "Usuario no encontrado",error:true });
-      }
-      usuarioModel.verifyContrasena(user.id, actualContrasena, async (err, isValid) => {
-        if (err || !isValid) {
           return res
             .status(200)
-            .json({
+            .json({ message: "Correo no encontrado", error: true });
+        }
+        return res
+          .status(200)
+          .json({ message: "Error interno del servidor", error: true });
+      }
+      if (!user) {
+        return res
+          .status(200)
+          .json({ message: "Usuario no encontrado", error: true });
+      }
+      usuarioModel.verifyContrasena(
+        user.id,
+        actualContrasena,
+        async (err, isValid) => {
+          if (err || !isValid) {
+            return res.status(200).json({
               message: "La contraseña actual es incorrecta",
             });
-        }
-
-        // Actualizar la contraseña del usuario en la base de datos
-        usuarioModel.actualizarContrasena(user.id, nuevaContrasena, async (err,usuarioMod)=>{
-          if (err) {
-            return res.status(200).json({ message: "Error al guardar la contraseña",error:true });
           }
-          return res
-          .status(200)
-          .json({ message: "Contraseña cambiada con éxito",error:false });
-        });
-      });
+
+          // Actualizar la contraseña del usuario en la base de datos
+          usuarioModel.actualizarContrasena(
+            user.id,
+            nuevaContrasena,
+            async (err, usuarioMod) => {
+              if (err) {
+                return res
+                  .status(200)
+                  .json({
+                    message: "Error al guardar la contraseña",
+                    error: true,
+                  });
+              }
+              return res
+                .status(200)
+                .json({
+                  message: "Contraseña cambiada con éxito",
+                  error: false,
+                });
+            }
+          );
+        }
+      );
     });
   } catch (error) {
-    return res.status(400).json({ message: "Contraseña incorrecta",error:true });
+    return res
+      .status(400)
+      .json({ message: "Contraseña incorrecta", error: true });
   }
 });
 
 // Configurar la carpeta de archivos estáticos para las imágenes subidas
 app.use("/uploads", express.static("uploads"));
 
-app.listen(4000, '0.0.0.0', () => {
-  console.log('Servidor corriendo en http://0.0.0.0:4000');
+app.listen(4000, "0.0.0.0", () => {
+  console.log("Servidor corriendo en http://0.0.0.0:4000");
 });

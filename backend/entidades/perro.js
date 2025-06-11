@@ -1,8 +1,8 @@
 // Perro.js
 class Perro {
-    constructor(id, ubicacion, tamano, contacto, edad, descripcion, nombre, foto, estadoAdopcion, userId,razas,nombreUsuario) {
+    constructor(id, direccion,provincia,canton,distrito, tamano, contacto, edad, descripcion, nombre, foto, estadoAdopcion, userId,razas,nombreUsuario) {
       this.id = id;
-      this.ubicacion = ubicacion;
+      this.direccion = direccion;
       this.tamano = tamano;
       this.contacto = contacto;
       this.edad = edad;
@@ -13,10 +13,13 @@ class Perro {
       this.userId = userId;
       this.razas=razas;
       this.nombreUsuario=nombreUsuario;
+      this.provincia = provincia;
+      this.canton = canton;
+      this.distrito = distrito;
     }
   
     static validate(perro) {
-      const requiredFields = ['ubicacion', 'tamano', 'contacto', 'edad', 'descripcion', 'nombre', 'foto', 'estadoAdopcion', 'userId'];
+      const requiredFields = ['direccion', 'tamano', 'contacto', 'edad', 'descripcion', 'nombre', 'foto', 'estadoAdopcion', 'userId','provincia','canton','distrito'];
       for (const field of requiredFields) {
         if (perro[field] === undefined || perro[field] === null) {
           throw new Error(`El campo ${field} es obligatorio.`);
