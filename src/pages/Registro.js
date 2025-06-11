@@ -47,9 +47,10 @@ function Registro() {
           URL_SERVICIO + "registroUsuario",
           values,
           {
-            headers: {
-              "ngrok-skip-browser-warning": "true",
-            },
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
           }
         );
         if (response.status === 201) {
