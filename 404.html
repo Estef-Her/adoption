@@ -1,7 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
-    <meta http-equiv="refresh" content="0; url=/adoption/" />
+    <meta charset="UTF-8" />
+    <title>Redirigiendo...</title>
+    <script>
+      // Redirige al index con la ruta original como hash
+      const path = location.pathname.replace('/adoption', '');
+      location.replace('/adoption/#' + path);
+    </script>
   </head>
-  <body></body>
+  <body>
+    <p>Redirigiendo...</p>
+  </body>
 </html>
