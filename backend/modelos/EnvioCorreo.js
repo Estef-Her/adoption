@@ -73,6 +73,35 @@ const enviarCorreoRegistro = async (email, contrasena,user,recoveryLinkP) => {
     throw new Error('Error al enviar el correo');
   }
 };
+// Función para enviar un correo al crear usuario
+const enviarCorreoRegistroPropio = async (email,user,recoveryLinkP) => {
+  const link = recoveryLinkP+`adoption/login`; // URL de recuperación
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: email,
+    subject: 'Usuario registrado',
+    html: `<div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f9f9f9; border-radius: 10px; border: 1px solid #ddd;">
+  <img src="https://raw.githubusercontent.com/Estef-Her/adoption/main/src/images/logo.png" alt="Encuentra a tu Amigo" style="max-width: 150px; margin-bottom: 20px;">
+  <h2 style="color: #333;">Bienvenido a Encuentra a tu Amigo</h2>
+  <p style="font-size: 16px; color: #555;">
+    Hola <strong>${user.nombre}</strong> usted se ha registrado en la plataforma <strong>Encuentra a tu Amigo</strong>.  
+    Para ingresar, utilice su correo electrónico <strong>${user.correo}</strong> y la contraseña que definió
+  </p>
+  <p style="font-size: 16px; color: #777;">Recuerde crear una nueva contraseña al ingresar a la plataforma.</p>
+  <a href="${link}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #d1956a; text-decoration: none; border-radius: 5px; margin-top: 10px;font-size: 16px;">
+    Ingresar a la Plataforma
+  </a>
+</div>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Correo de registro enviado');
+  } catch (error) {
+    console.error('Error al enviar el correo: ', error);
+    throw new Error('Error al enviar el correo');
+  }
+};
 // Función para enviar un correo al modificar un usuario
 const enviarCorreoModificacion = async (email, contrasena,user,recoveryLinkP) => {
   const link = recoveryLinkP+`adoption/login`; // URL de recuperación

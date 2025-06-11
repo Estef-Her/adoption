@@ -186,7 +186,7 @@ function ModificarAnimal() {
       setModCargado(true);
       // Enviar los datos modificados
       axios
-        .put(URL_SERVICIO + "animals", formData, {
+        .post(URL_SERVICIO + "modificarAnimal", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             "ngrok-skip-browser-warning": "true",

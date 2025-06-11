@@ -210,7 +210,7 @@ app.delete("/animals/:id", async (req, res) => {
     res.status(500).json({ error: "Error al procesar la solicitud." });
   }
 });
-app.put("/animals", upload.single("imageFile"), async (req, res) => {
+app.post("/modificarAnimal", upload.single("imageFile"), async (req, res) => {
   try {
     const {
       id,
@@ -399,15 +399,21 @@ app.get("/razas", (req, res) => {
 });
 
 //Usuario
-app.post("/registroUsuario", (req, res) => {
+app.post("/registroUsuario", async (req, res) => {
   const { nombre, telefono, correo, contrasena, rol } = req.body;
   const nuevoUsuario = { nombre, telefono, correo, contrasena, rol };
 
   // Crear el usuario en la base de datos
-  usuarioModel.createUsuario(nuevoUsuario, (err, usuarioCreado) => {
+  usuarioModel.createUsuario(nuevoUsuario, async (err, usuarioCreado) => {
     if (err) {
       return res.status(500).json({ error: "Error al crear el usuario" });
     }
+    
+      await EnvioCorreo.enviarCorreoRegistroPropio(
+        nuevoUsuario.correo,
+        usuarioCreado,
+        URL_USAR
+      );
     res
       .status(201)
       .json({ message: "Usuario creado exitosamente", usuario: usuarioCreado });
@@ -455,7 +461,7 @@ app.post("/registroUsuarioAd", async (req, res) => {
     }
   });
 });
-app.put("/modificarUsuario", async (req, res) => {
+app.post("/modificarUsuario", async (req, res) => {
   const { nombre, telefono, correo, rol, id } = req.body;
   const nuevoUsuario = { nombre, telefono, correo, rol, id };
   // Crear el usuario en la base de datos

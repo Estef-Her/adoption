@@ -61,7 +61,7 @@ function UsuariosCRUD() {
           if(!values.id){
             values.id = selectedUser.id;
           }
-          const response = await axios.put(URL_SERVICIO + 'modificarUsuario', values,{
+          const response = await axios.post(URL_SERVICIO + 'modificarUsuario', values,{
     headers: {
       'ngrok-skip-browser-warning': 'true'
     }});
