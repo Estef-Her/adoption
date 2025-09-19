@@ -274,7 +274,7 @@ const modificarPerro = (datos, razaArray, callback) => {
 
       // Actualiza la información del perro
       const actualizarPerroQuery =
-        "UPDATE perro SET direccion = ?,provincia = ?,canton = ?,distrito = ?, tamano = ?, contacto = ?, edad = ?, nombre = ?, descripcion = ?, foto = ? WHERE id = ?";
+        "UPDATE perro SET direccion = ?,provincia = ?,canton = ?,distrito = ?, tamano = ?, contacto = ?, edad = ?, nombre = ?, descripcion = ?, estadoAdopcion = ?, foto = ? WHERE id = ?";
 
       db.query(
         actualizarPerroQuery,
@@ -288,6 +288,7 @@ const modificarPerro = (datos, razaArray, callback) => {
           datos.edad,
           datos.nombre,
           datos.descripcion,
+          datos.estadoAdopcion,
           datos.foto,
           datos.id,
         ],
