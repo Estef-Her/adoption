@@ -6,7 +6,7 @@ const TeachableMachineComponent = () => {
     const [predictions, setPredictions] = useState([]);
     const [image, setImage] = useState(null);
 
-    // const URL = "https://teachablemachine.withgoogle.com/models/lS3pHIPWc/";
+    //const URL = "https://teachablemachine.withgoogle.com/models/lS3pHIPWc/";
     const URL = "https://teachablemachine.withgoogle.com/models/n06CORIUr/";
 
     // Cargar el modelo al iniciar el componente
