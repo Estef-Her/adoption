@@ -7,7 +7,7 @@ const TeachableMachineComponent = () => {
     const [image, setImage] = useState(null);
 
     //const URL = "https://teachablemachine.withgoogle.com/models/lS3pHIPWc/";
-    const URL = "https://teachablemachine.withgoogle.com/models/n06CORIUr/";
+    const URL = "https://teachablemachine.withgoogle.com/models/IAALo_xqW/";
 
     // Cargar el modelo al iniciar el componente
     useState(() => {
