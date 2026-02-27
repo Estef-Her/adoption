@@ -26,22 +26,20 @@ cocoSsd.load().then((loadedModel) => {
             const predictions = await this.model.detect(image);
             console.log('Predicciones:', predictions);
       
-            const hasDog = predictions.some(
+            const dogs = predictions.filter(
               (pred) => pred.class === 'dog' && pred.score >= 0.5
             );
       
-            return hasDog; // Retorna true si hay un perro con score >= 0.5
+            return dogs; // Retorna true si hay un perro con score >= 0.5
           } catch (error) {
             console.error('Error al hacer la predicción:', error);
-            return false;
+            return 0;
           }
         } else {
           console.warn('Modelo o imagen no están disponibles.');
-          return false;
+          return 0;
         }
       };
-      
-      
 }
 
 // Exportar la clase para su uso en otros archivos

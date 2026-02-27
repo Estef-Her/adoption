@@ -248,22 +248,26 @@ function ModificarAnimal() {
         if (imageRef.current.complete) resolve();
         else imageRef.current.onload = resolve;
       });
-      const hayPerro = await DeteccionImagenInstance.handlePredict(
-        imageRef.current
-      );
-
-      if (!hayPerro) {
-        setRaza([]);
-        setRazaString("");
-        formik.setFieldValue("raza", "");
-        setImageFile(null); // Limpiar imagen
-        imageRef.current = null;
-        setValidationMessage(
-          "No se detectó un perro en la imagen. Por favor, suba una imagen válida, o intente probar con una toma diferente."
-        );
-        setLoadingImage(false);
-        return; // No continuar si no hay perro
-      }
+        const perros = await DeteccionImagenInstance.handlePredict(imageRef.current);
+  
+        if (perros.length===0) {
+          setRaza([]);
+          setRazaString("");
+          setImageFile(null);           // Limpiar imagen
+          imageRef.current = null;      
+          setValidationMessage('No se detectó un perro en la imagen. Por favor, suba una imagen válida, o intente probar con una toma diferente.');
+          setLoadingImage(false);
+          return; // No continuar si no hay perro
+        }
+          if (perros.length>1) {
+          setRaza([]);
+          setRazaString("");
+          setImageFile(null);           // Limpiar imagen
+          imageRef.current = null;      
+          setValidationMessage('Se detectaron múltiples perros. Solo se permite uno.');
+          setLoadingImage(false);
+          return; // No continuar si no hay perro
+        }
     }
     if (TeacheableMachineInstance.getModel() && imageSrc) {
       setValidationMessage("");
